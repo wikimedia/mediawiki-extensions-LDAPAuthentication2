@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Robert Vogel <vogel@hallowelt.com>"
+		]
+	},
+	"ldapauthentication-desc": "{{desc|name=LDAPAuthentication|url=https://www.mediawiki.org/wiki/Extension:LDAPAuthentication}}"
+}
