@@ -23,6 +23,7 @@ class PrimaryAuthenticationProvider extends LocalPasswordPrimaryAuthenticationPr
 	/**
 	 *
 	 * @param AuthenticationRequest[] $reqs
+	 * @return AuthenticationResponse
 	 */
 	public function beginPrimaryAuthentication( array $reqs ) {
 		$req = AuthenticationRequest::getRequestByClass(
