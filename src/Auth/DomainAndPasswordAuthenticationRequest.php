@@ -17,6 +17,7 @@ class DomainAndPasswordAuthenticationRequest extends PasswordAuthenticationReque
 			'options' => $this->makeDomainOptions(),
 			'label' => wfMessage( 'ldapauthentication-label-domain' ),
 			'help' => wfMessage( 'ldapauthentication-help-domain' ),
+			'weight' => -50
 		];
 
 		return $ret;
