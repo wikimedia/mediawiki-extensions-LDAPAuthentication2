@@ -3,8 +3,8 @@
 	"version": "1.0.0-alpha",
 	"author": [
 		"Cindy Cicalese",
-		"Mark A. Hershberger",
-		"Robert Vogel"
+		"[http://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
+		"[http://mediawiki.org/wiki/User:Osnard Robert Vogel]"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:LDAPAuthentication",
 	"descriptionmsg": "ldapauthentication-desc",
