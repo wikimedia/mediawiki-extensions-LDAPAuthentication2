@@ -5,9 +5,5 @@
 		]
 	},
 	"ldapauthentication-desc": "{{desc|name=LDAPAuthentication|url=https://www.mediawiki.org/wiki/Extension:LDAPAuthentication}}",
-	"ldapauthentication-label-domain": "Label for select box to choose LDAP/AD domain",
-	"ldapauthentication-help-domain": "Tooltip for domain select box",
-	"ldapauthentication-domain-local": "Label for selection in domain select box that allows local authentication",
-	"ldapauthentication-domain-LDAP": "Label for selection in domain select box thas allows authentication against the default domain",
-	"ldapauthentication-error-authentication-failed": "Error message in case that a login attempt failed"
+	"ldapauthentication-error-authentication-failed": "Error message in case that a login attempt failed.\nParameters:\n* $1 - The selected domain"
 }

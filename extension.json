@@ -16,6 +16,11 @@
 		]
 	},
 	"callback": "MediaWiki\\Extension\\LDAPAuthentication\\Setup::onRegistration",
+	"config": {
+		"PluggableAuth_Class": {
+			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
+		}
+	},
 	"load_composer_autoloader" : true,
 	"manifest_version": 2
 }

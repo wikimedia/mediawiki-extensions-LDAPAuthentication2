@@ -5,9 +5,5 @@
 		]
 	},
 	"ldapauthentication-desc": "Allows authentication against a LDAP resource",
-	"ldapauthentication-label-domain": "Domain",
-	"ldapauthentication-help-domain": "Choose the domain you want to authenticate against",
-	"ldapauthentication-domain-local": "local",
-	"ldapauthentication-domain-LDAP": "LDAP",
-	"ldapauthentication-error-authentication-failed": "Could not authenticate credentials against selected domain"
+	"ldapauthentication-error-authentication-failed": "Could not authenticate credentials against domain \"$1\""
 }

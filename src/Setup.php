@@ -2,12 +2,12 @@
 
 namespace MediaWiki\Extension\LDAPAuthentication;
 
+use MediaWiki\Extension\LDAPProvider\ClientFactory;
+
 class Setup {
 	public static function onRegistration() {
-		/*$GLOBALS['wgSessionProviders']['MyCustomSessionProvider'] = [
-			'class' => 'MyCustomSessionProvider',
-			'args' => [ 'arg1', 'arg2' ],
-		];*/
+		$configuredDomains = ClientFactory::getInstance()->getConfiguredDomains();
+		$GLOBALS['wgPluggableAuth_ExtraLoginFields'] =
+			(array) new ExtraLoginFields( $configuredDomains );
 	}
 }
-
