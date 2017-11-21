@@ -2,11 +2,11 @@
 
 namespace MediaWiki\Extension\LDAPAuthentication;
 
-use MediaWiki\Extension\LDAPProvider\ClientFactory;
+use MediaWiki\Extension\LDAPProvider\DomainConfigFactory;
 
 class Setup {
-	public static function onRegistration() {
-		$configuredDomains = ClientFactory::getInstance()->getConfiguredDomains();
+	public static function setup() {
+		$configuredDomains = DomainConfigFactory::getInstance()->getConfiguredDomains();
 		$GLOBALS['wgPluggableAuth_ExtraLoginFields'] =
 			(array) new ExtraLoginFields( $configuredDomains );
 	}

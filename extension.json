@@ -15,7 +15,9 @@
 			"i18n"
 		]
 	},
-	"callback": "MediaWiki\\Extension\\LDAPAuthentication\\Setup::onRegistration",
+	"ExtensionFunctions": [
+		"MediaWiki\\Extension\\LDAPAuthentication\\Setup::setup"
+	],
 	"config": {
 		"PluggableAuth_Class": {
 			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
