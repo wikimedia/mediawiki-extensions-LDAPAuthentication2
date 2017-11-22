@@ -35,13 +35,18 @@ class PluggableAuth extends PluggableAuthBase {
 				)->text();
 			return;
 		}
-
-		$basicUserInfoRequest = new BasicUserInfoRequest( $ldapClient, $username );
-		$result = $basicUserInfoRequest->execute();
-
-		$username = $result[BasicUserInfoRequest::USERNAME];
-		$realname = $result[BasicUserInfoRequest::REALNAME];
-		$email = $result[BasicUserInfoRequest::EMAIL];
+		try {
+			$result = $ldapClient->getUserInfo( $username );
+			$username = $result[Config::USERINFO_USERNAME_ATTR];
+			$realname = $result[Config::USERINFO_REALNAME_ATTR];
+			$email = $result[Config::USERINFO_EMAIL_ATTR];
+		} catch( \Exception $ex ) {
+			$errorMessage =
+				wfMessage(
+					'ldapauthentication-error-authentication-failed-userinfo',
+					$domain
+				)->text();
+		}
 	}
 
 	/**

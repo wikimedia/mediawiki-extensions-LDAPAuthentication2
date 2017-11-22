@@ -23,6 +23,17 @@
 			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
 		}
 	},
+	"attributes": {
+		"LDAPProvider": {
+			"DefaultSettings": {
+				"authentication": {
+					"usernameattribute": "samaccountname",
+					"realnameattribute": "cn",
+					"emailattribute": "mail"
+				}
+			}
+		}
+	},
 	"load_composer_autoloader" : true,
 	"manifest_version": 2
 }
