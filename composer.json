@@ -1,7 +1,7 @@
 {
 	"name": "mediawiki/ldap-authentication",
 	"extra": {
-		"mw-name": "LDAPAuthentication"
+		"installer-name": "LDAPAuthentication"
 	},
 	"license": "GPL-2.0+",
 	"type": "mediawiki-extension",
