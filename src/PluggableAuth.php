@@ -3,8 +3,10 @@
 namespace MediaWiki\Extension\LDAPAuthentication;
 
 use PluggableAuth as PluggableAuthBase;
+use PluggableAuthLogin;
 use MediaWiki\Extension\LDAPAuthentication\ExtraLoginFields;
 use MediaWiki\Extension\LDAPProvider\ClientFactory;
+use MediaWiki\Auth\AuthManager;
 
 class PluggableAuth extends PluggableAuthBase {
 
@@ -25,6 +27,10 @@ class PluggableAuth extends PluggableAuthBase {
 		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN];
 		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
 		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
+
+		if( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
+			return true;
+		}
 
 		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
 		if( !$ldapClient->canBindAs( $username, $password ) ) {

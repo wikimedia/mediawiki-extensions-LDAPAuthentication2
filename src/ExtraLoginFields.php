@@ -6,13 +6,14 @@ class ExtraLoginFields extends \ArrayObject {
 	const DOMAIN = 'domain';
 	const USERNAME = 'username';
 	const PASSWORD = 'password';
+	const DOMAIN_VALUE_LOCAL = 'local';
 
 	public function __construct( $domains ) {
 		$domainOptions = [];
 		foreach( $domains as $domain ) {
 			$domainOptions[$domain] = new \RawMessage( $domain );
 		}
-		$domainOptions['local'] = new \RawMessage( 'local' );
+		$domainOptions[static::DOMAIN_VALUE_LOCAL] = new \RawMessage( 'local' );
 		parent::__construct( [
 			static::DOMAIN => [
 				'type' => 'select',
