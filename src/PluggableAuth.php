@@ -7,8 +7,17 @@ use PluggableAuthLogin;
 use MediaWiki\Extension\LDAPAuthentication\ExtraLoginFields;
 use MediaWiki\Extension\LDAPProvider\ClientFactory;
 use MediaWiki\Auth\AuthManager;
+use MediaWiki\Extension\LDAPProvider\UserDomainStore;
 
 class PluggableAuth extends PluggableAuthBase {
+
+	const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
+
+	/**
+	 *
+	 * @var string
+	 */
+	protected $selectedDomain = '';
 
 	/**
 	 * Authenticates against LDAP
@@ -24,22 +33,22 @@ class PluggableAuth extends PluggableAuthBase {
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
-		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN];
+		$this->selectedDomain = $extraLoginFields[ExtraLoginFields::DOMAIN];
 		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
 		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
 
-		if( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
+		if( $this->selectedDomain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			return true;
 		}
 
-		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
+		$ldapClient = ClientFactory::getInstance()->getForDomain( $this->selectedDomain );
 		if( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage =
 				wfMessage(
 					'ldapauthentication-error-authentication-failed',
-					$domain
+					$this->selectedDomain
 				)->text();
-			return;
+			return false;
 		}
 		try {
 			$result = $ldapClient->getUserInfo( $username );
@@ -50,9 +59,22 @@ class PluggableAuth extends PluggableAuthBase {
 			$errorMessage =
 				wfMessage(
 					'ldapauthentication-error-authentication-failed-userinfo',
-					$domain
+					$this->selectedDomain
 				)->text();
+			return false;
 		}
+
+		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
+		 * being called before PluggableAuth::saveExtraAttributes (see below)
+		 * we can not rely on LdapProvider\UserDomainStore here. We can also
+		 * not persist the domain here, as the user id may be null (fist login)
+		 */
+		$authManager->setAuthenticationSessionData(
+			static::DOMAIN_SESSION_KEY,
+			$this->selectedDomain
+		);
+
+		return true;
 	}
 
 	/**
@@ -68,6 +90,13 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @param int $id
 	 */
 	public function saveExtraAttributes( $id ) {
-		//Nothing to do
+		$userDomainStore = new UserDomainStore(
+			\MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer()
+		);
+
+		$userDomainStore->setDomainForUser(
+			\User::newFromId( $id ),
+			$this->selectedDomain
+		);
 	}
 }
