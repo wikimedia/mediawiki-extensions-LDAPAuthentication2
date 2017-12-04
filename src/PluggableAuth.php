@@ -14,12 +14,6 @@ class PluggableAuth extends PluggableAuthBase {
 	const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
 
 	/**
-	 *
-	 * @var string
-	 */
-	protected $selectedDomain = '';
-
-	/**
 	 * Authenticates against LDAP
 	 * @param int $id
 	 * @param string $username
@@ -33,20 +27,20 @@ class PluggableAuth extends PluggableAuthBase {
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
-		$this->selectedDomain = $extraLoginFields[ExtraLoginFields::DOMAIN];
+		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN];
 		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
 		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
 
-		if( $this->selectedDomain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
+		if( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			return true;
 		}
 
-		$ldapClient = ClientFactory::getInstance()->getForDomain( $this->selectedDomain );
+		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
 		if( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage =
 				wfMessage(
 					'ldapauthentication-error-authentication-failed',
-					$this->selectedDomain
+					$domain
 				)->text();
 			return false;
 		}
@@ -59,7 +53,7 @@ class PluggableAuth extends PluggableAuthBase {
 			$errorMessage =
 				wfMessage(
 					'ldapauthentication-error-authentication-failed-userinfo',
-					$this->selectedDomain
+					$domain
 				)->text();
 			return false;
 		}
@@ -71,7 +65,7 @@ class PluggableAuth extends PluggableAuthBase {
 		 */
 		$authManager->setAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY,
-			$this->selectedDomain
+			$domain
 		);
 
 		return true;
@@ -90,13 +84,18 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @param int $id
 	 */
 	public function saveExtraAttributes( $id ) {
+		$authManager = AuthManager::singleton();
+		$domain = $authManager->getAuthenticationSessionData(
+			static::DOMAIN_SESSION_KEY
+		);
+
 		$userDomainStore = new UserDomainStore(
 			\MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer()
 		);
 
 		$userDomainStore->setDomainForUser(
 			\User::newFromId( $id ),
-			$this->selectedDomain
+			$domain
 		);
 	}
 }
