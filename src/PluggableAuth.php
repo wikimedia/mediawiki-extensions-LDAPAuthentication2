@@ -1,13 +1,13 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extensions\LDAPAuthentication;
 
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
-use MediaWiki\Extension\LDAPAuthentication\ExtraLoginFields;
-use MediaWiki\Extension\LDAPProvider\ClientFactory;
+use MediaWiki\Extensions\LDAPAuthentication\ExtraLoginFields;
+use MediaWiki\Extensions\LDAPProvider\ClientFactory;
 use MediaWiki\Auth\AuthManager;
-use MediaWiki\Extension\LDAPProvider\UserDomainStore;
+use MediaWiki\Extensions\LDAPProvider\UserDomainStore;
 
 class PluggableAuth extends PluggableAuthBase {
 

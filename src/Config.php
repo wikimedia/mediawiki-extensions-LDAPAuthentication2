@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extensions\LDAPAuthentication;
 
 class Config {
 	const USERINFO_USERNAME_ATTR = 'usernameattribute';

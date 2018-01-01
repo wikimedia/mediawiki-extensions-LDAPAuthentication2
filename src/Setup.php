@@ -1,8 +1,8 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extensions\LDAPAuthentication;
 
-use MediaWiki\Extension\LDAPProvider\DomainConfigFactory;
+use MediaWiki\Extensions\LDAPProvider\DomainConfigFactory;
 
 class Setup {
 	public static function setup() {

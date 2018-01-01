@@ -46,8 +46,17 @@
 		"jakub-onderka/php-console-highlighter": "0.3.2"
 	},
 	"scripts": {
+		"phpunit": "php $MW_INSTALL_PATH/tests/phpunit/phpunit.php -c .phpunit.xml.dist",
+		"phpdbg": "phpdbg -qrr $MW_INSTALL_PATH/tests/phpunit/phpunit.php -c .phpunit.xml.dist",
 		"test": [
-			"parallel-lint . --exclude vendor --exclude node_modules"
+			"parallel-lint . --exclude vendor --exclude node_modules",
+			"minus-x check .",
+			"phpmd src text .phpmd.xml || :",
+			"phpcs -p -s"
+		],
+		"fix": [
+			"minus-x fix .",
+			"phpcbf"
 		]
 	}
 }

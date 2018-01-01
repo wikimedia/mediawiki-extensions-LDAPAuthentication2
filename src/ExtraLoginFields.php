@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extensions\LDAPAuthentication;
 
 class ExtraLoginFields extends \ArrayObject {
 	const DOMAIN = 'domain';
