@@ -5,7 +5,7 @@
 	},
 	"license": "GPL-2.0+",
 	"type": "mediawiki-extension",
-	"homepage": "https:\/\/www.mediawiki.org\/wiki\/Extension:LDAPAuthentication",
+	"homepage": "https://www.mediawiki.org/wiki/Extension:LDAPAuthentication",
 	"description": "Allows authentication against a LDAP resource",
 	"keywords": [
 		"extension",
@@ -32,18 +32,23 @@
 	],
 	"autoload" : {
 		"psr-4": {
-			"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit",
-			"MediaWiki\\Extension\\LDAPAuthentication\\" : "src"
+			"MediaWiki\\Extensions\\LDAPAuthentication\\Tests\\" : "tests/phpunit",
+			"MediaWiki\\Extensions\\LDAPAuthentication\\" : "src"
 		}
 	},
 	"require": {
+		"mediawiki/ldap-provider": "dev-master-work",
 		"ext-ldap": "*",
 		"php": ">=5.3.0",
 		"composer/installers": "1.*,>=1.0.1"
 	},
 	"require-dev": {
 		"jakub-onderka/php-parallel-lint": "0.9.2",
-		"jakub-onderka/php-console-highlighter": "0.3.2"
+		"jakub-onderka/php-console-highlighter": "0.3.2",
+		"mediawiki/minus-x": "0.2.1",
+		"mediawiki/mediawiki-codesniffer": "14.1.0",
+		"phpunit/phpunit": "4.8.36",
+		"phpmd/phpmd": "~2.1"
 	},
 	"scripts": {
 		"phpunit": "php $MW_INSTALL_PATH/tests/phpunit/phpunit.php -c .phpunit.xml.dist",
