@@ -2,12 +2,12 @@
 
 namespace MediaWiki\Extensions\LDAPAuthentication;
 
+use Exception;
+use MediaWiki\Auth\AuthManager;
+use MediaWiki\Extensions\LDAPProvider\ClientFactory;
+use MediaWiki\Extensions\LDAPProvider\UserDomainStore;
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
-use MediaWiki\Extensions\LDAPProvider\ClientFactory;
-use MediaWiki\Auth\AuthManager;
-use MediaWiki\Extensions\LDAPProvider\UserDomainStore;
-use Exception;
 use User;
 
 class PluggableAuth extends PluggableAuthBase {
