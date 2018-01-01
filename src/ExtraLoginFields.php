@@ -8,9 +8,12 @@ class ExtraLoginFields extends \ArrayObject {
 	const PASSWORD = 'password';
 	const DOMAIN_VALUE_LOCAL = 'local';
 
-	public function __construct( $domains ) {
+	/**
+	 * @param array $domains to set up
+	 */
+	public function __construct( array $domains ) {
 		$domainOptions = [];
-		foreach( $domains as $domain ) {
+		foreach ( $domains as $domain ) {
 			$domainOptions[$domain] = new \RawMessage( $domain );
 		}
 		$domainOptions[static::DOMAIN_VALUE_LOCAL] = new \RawMessage( 'local' );

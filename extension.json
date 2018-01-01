@@ -22,11 +22,11 @@
 		]
 	},
 	"ExtensionFunctions": [
-		"MediaWiki\\Extension\\LDAPAuthentication\\Setup::setup"
+		"MediaWiki\\Extensions\\LDAPAuthentication\\Setup::init"
 	],
 	"config": {
 		"PluggableAuth_Class": {
-			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
+			"value": "MediaWiki\\Extensions\\LDAPAuthentication\\PluggableAuth"
 		}
 	},
 	"attributes": {

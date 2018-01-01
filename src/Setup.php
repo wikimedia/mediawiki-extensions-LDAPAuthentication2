@@ -5,9 +5,12 @@ namespace MediaWiki\Extensions\LDAPAuthentication;
 use MediaWiki\Extensions\LDAPProvider\DomainConfigFactory;
 
 class Setup {
-	public static function setup() {
+	/**
+	 * @SuppressWarnings( SuperGlobals )
+	 */
+	public static function init() {
 		$configuredDomains = DomainConfigFactory::getInstance()->getConfiguredDomains();
-		$GLOBALS['wgPluggableAuth_ExtraLoginFields'] =
-			(array) new ExtraLoginFields( $configuredDomains );
+		$GLOBALS['wgPluggableAuth_ExtraLoginFields']
+			= (array)( new ExtraLoginFields( $configuredDomains ) );
 	}
 }
