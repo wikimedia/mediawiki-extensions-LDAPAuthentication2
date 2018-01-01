@@ -10,6 +10,12 @@
 	"descriptionmsg": "ldapauthentication-desc",
 	"license-name": "GPL-2.0",
 	"type": "other",
+	"requires": {
+		"extensions": {
+			"LDAPProvider": "*",
+			"PluggableAuth": "*"
+		}
+	},
 	"MessagesDirs": {
 		"LDAPAuthentication": [
 			"i18n"
