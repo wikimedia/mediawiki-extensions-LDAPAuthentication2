@@ -54,6 +54,10 @@
 	"scripts": {
 		"phpunit": "php $MW_INSTALL_PATH/tests/phpunit/phpunit.php -c .phpunit.xml.dist",
 		"phpdbg": "phpdbg -qrr $MW_INSTALL_PATH/tests/phpunit/phpunit.php -c .phpunit.xml.dist",
+		"phpmd": "phpmd src text .phpmd.xml",
+		"phpcs": "phpcs -p -s",
+		"phpcbf": "phpcbf",
+
 		"test": [
 			"parallel-lint . --exclude vendor --exclude node_modules",
 			"minus-x check .",

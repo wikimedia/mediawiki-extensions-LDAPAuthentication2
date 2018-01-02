@@ -40,6 +40,8 @@ class PluggableAuth extends PluggableAuthBase {
 		}
 
 		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
+		# Need a way to optionally alter the username here to match what the server expects.
+		# $username = sprintf( "uid=%s,dc=example,dc=com", $username );
 		if ( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage =
 				wfMessage(
