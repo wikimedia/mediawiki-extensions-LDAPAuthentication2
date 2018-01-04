@@ -68,5 +68,6 @@
 			"minus-x fix .",
 			"phpcbf"
 		]
-	}
+	},
+	"manifest_version": 2
 }

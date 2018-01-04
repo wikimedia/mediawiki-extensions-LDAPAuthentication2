@@ -35,8 +35,13 @@ class PluggableAuth extends PluggableAuthBase {
 		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
 		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
 
+		$config = Config::newInstance();
+
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
-			return true;
+			if ( !$config->get( "AllowLocalLogin" ) ) {
+				$errorMessage = "Local logins are not allowed";
+			}
+			return;
 		}
 
 		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
@@ -66,8 +71,9 @@ class PluggableAuth extends PluggableAuthBase {
 
 		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
 		 * being called before PluggableAuth::saveExtraAttributes (see below)
-		 * we can not rely on LdapProvider\UserDomainStore here. We can also
-		 * not persist the domain here, as the user id may be null (fist login)
+		 * we can not rely on LdapProvider\UserDomainStore here. Further
+		 * complicating things, we can not persist the domain here, as the
+		 * user id may be null (first login)
 		 */
 		$authManager->setAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY,
@@ -91,7 +97,14 @@ class PluggableAuth extends PluggableAuthBase {
 		$domain = $authManager->getAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY
 		);
+		$config = Config::newInstance();
 
+		if ( $domain === null ) {
+			if ( !$config->get( "AllowLocalLogin" ) ) {
+				throw new MWException( "Local logins are not allowed" );
+			}
+			return;
+		}
 		$userDomainStore = new UserDomainStore(
 			\MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer()
 		);

@@ -25,7 +25,13 @@
 		"MediaWiki\\Extensions\\LDAPAuthentication\\Setup::init"
 	],
 	"config": {
-		"PluggableAuth_Class": {
+		"LDAPAuthenticationAllowLocalLogin": {
+			"value": false,
+			"path": false,
+			"description": "Allow users without an LDAP-backed ID to log into the wiki.",
+			"public": true
+		},
+		"wgPluggableAuth_Class": {
 			"value": "MediaWiki\\Extensions\\LDAPAuthentication\\PluggableAuth"
 		}
 	},
