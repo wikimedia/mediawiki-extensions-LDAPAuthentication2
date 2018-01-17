@@ -39,9 +39,9 @@ class PluggableAuth extends PluggableAuthBase {
 
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			if ( !$config->get( "AllowLocalLogin" ) ) {
-				$errorMessage = "Local logins are not allowed";
+				$errorMessage = wfMessage( 'ldapauthentication-no-local-login' )->plain();
 			}
-			return;
+			return true;
 		}
 
 		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
@@ -101,7 +101,9 @@ class PluggableAuth extends PluggableAuthBase {
 
 		if ( $domain === null ) {
 			if ( !$config->get( "AllowLocalLogin" ) ) {
-				throw new MWException( "Local logins are not allowed" );
+				throw new MWException(
+					wfMessage( 'ldapauthentication-no-local-login' )->plain()
+				);
 			}
 			return;
 		}
