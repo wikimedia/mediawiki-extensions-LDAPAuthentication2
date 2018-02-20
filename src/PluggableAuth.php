@@ -79,6 +79,7 @@ class PluggableAuth extends PluggableAuthBase {
 			static::DOMAIN_SESSION_KEY,
 			$domain
 		);
+		return true;
 	}
 
 	/**
