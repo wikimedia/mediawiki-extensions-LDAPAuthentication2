@@ -5,10 +5,6 @@ namespace MediaWiki\Extensions\LDAPAuthentication;
 use GlobalVarConfig;
 
 class Config extends GlobalVarConfig {
-	const USERINFO_USERNAME_ATTR = 'usernameattribute';
-	const USERINFO_REALNAME_ATTR = 'realnameattribute';
-	const USERINFO_EMAIL_ATTR = 'emailattribute';
-
 	const VERSION = "1.0.0-alpha";
 
 	public function __construct() {

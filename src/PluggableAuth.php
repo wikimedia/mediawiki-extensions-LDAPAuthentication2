@@ -4,6 +4,7 @@ namespace MediaWiki\Extensions\LDAPAuthentication;
 
 use Exception;
 use MediaWiki\Auth\AuthManager;
+use MediaWiki\Extensions\LDAPProvider\ClientConfig;
 use MediaWiki\Extensions\LDAPProvider\ClientFactory;
 use MediaWiki\Extensions\LDAPProvider\UserDomainStore;
 use PluggableAuth as PluggableAuthBase;
@@ -57,9 +58,9 @@ class PluggableAuth extends PluggableAuthBase {
 		}
 		try {
 			$result = $ldapClient->getUserInfo( $username );
-			$username = $result[Config::USERINFO_USERNAME_ATTR];
-			$realname = $result[Config::USERINFO_REALNAME_ATTR];
-			$email = $result[Config::USERINFO_EMAIL_ATTR];
+			$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
+			$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
+			$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )];
 		} catch ( Exception $ex ) {
 			$errorMessage =
 				wfMessage(
