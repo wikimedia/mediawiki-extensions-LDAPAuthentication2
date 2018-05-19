@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extensions\LDAPAuthentication;
+namespace MediaWiki\Extension\LDAPAuthentication;
 
 use GlobalVarConfig;
 

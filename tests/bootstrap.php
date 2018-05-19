@@ -9,8 +9,8 @@ date_default_timezone_set( 'UTC' );
 ini_set( 'display_errors', 1 );
 
 if (
-	!class_exists( 'MediaWiki\\Extensions\\LDAPAuthentication\\Config' )
-	|| ( $version = MediaWiki\Extensions\LDAPAuthentication\Config::getVersion() ) === null
+	!class_exists( 'MediaWiki\\Extension\\LDAPAuthentication\\Config' )
+	|| ( $version = MediaWiki\Extension\LDAPAuthentication\Config::getVersion() ) === null
 ) {
 	die( "\nLDAPAuthentication is not available, please check your Composer or LocalSettings.\n" );
 }

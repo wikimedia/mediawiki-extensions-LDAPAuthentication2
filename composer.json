@@ -30,12 +30,6 @@
 			"role": "Contributor"
 		}
 	],
-	"autoload" : {
-		"psr-4": {
-			"MediaWiki\\Extensions\\LDAPAuthentication\\Tests\\" : "tests/phpunit",
-			"MediaWiki\\Extensions\\LDAPAuthentication\\" : "src"
-		}
-	},
 	"require": {
 		"mediawiki/ldap-provider": "dev-master-work",
 		"mediawiki/pluggable-auth": "dev-master",

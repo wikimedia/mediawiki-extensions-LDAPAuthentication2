@@ -10,6 +10,10 @@
 	"descriptionmsg": "ldapauthentication-desc",
 	"license-name": "GPL-2.0",
 	"type": "other",
+	"AutoloadNamespaces" : {
+		"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit",
+		"MediaWiki\\Extension\\LDAPAuthentication\\" : "src"
+	},
 	"requires": {
 		"extensions": {
 			"LDAPProvider": "*",
@@ -22,7 +26,7 @@
 		]
 	},
 	"ExtensionFunctions": [
-		"MediaWiki\\Extensions\\LDAPAuthentication\\Setup::init"
+		"MediaWiki\\Extension\\LDAPAuthentication\\Setup::init"
 	],
 	"config_prefix": "",
 	"config": {
@@ -33,7 +37,7 @@
 			"public": true
 		},
 		"wgPluggableAuth_Class": {
-			"value": "MediaWiki\\Extensions\\LDAPAuthentication\\PluggableAuth"
+			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
 		}
 	},
 	"attributes": {
