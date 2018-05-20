@@ -11,8 +11,8 @@
 	"license-name": "GPL-2.0",
 	"type": "other",
 	"AutoloadNamespaces" : {
-		"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit",
-		"MediaWiki\\Extension\\LDAPAuthentication\\" : "src"
+		"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit/",
+		"MediaWiki\\Extension\\LDAPAuthentication\\" : "src/"
 	},
 	"requires": {
 		"extensions": {
