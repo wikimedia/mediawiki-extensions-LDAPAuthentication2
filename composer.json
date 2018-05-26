@@ -31,7 +31,7 @@
 		}
 	],
 	"require": {
-		"mediawiki/ldap-provider": "dev-master-work",
+		"mediawiki/ldap-provider": "dev-master",
 		"mediawiki/pluggable-auth": "dev-master",
 		"ext-ldap": "*",
 		"php": ">=5.3.0",
