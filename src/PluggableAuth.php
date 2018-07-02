@@ -6,6 +6,7 @@ use Exception;
 use MediaWiki\Auth\AuthManager;
 use MediaWiki\Extension\LDAPProvider\ClientConfig;
 use MediaWiki\Extension\LDAPProvider\ClientFactory;
+use MediaWiki\Extension\LDAPProvider\LDAPNoDomainConfigException as NoDomain;
 use MediaWiki\Extension\LDAPProvider\UserDomainStore;
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
@@ -45,14 +46,18 @@ class PluggableAuth extends PluggableAuthBase {
 			return true;
 		}
 
-		$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
-		# Need a way to optionally alter the username here to match what the server expects.
-		# $username = sprintf( "uid=%s,dc=example,dc=com", $username );
+		$ldapClient = null;
+		try {
+			$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
+		} catch ( NoDomain $e ) {
+			$errorMessage = wfMessage( 'ldapauthentication-no-domain-chosen' )->plain();
+			return false;
+		}
+
 		if ( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage =
 				wfMessage(
-					'ldapauthentication-error-authentication-failed',
-					$domain
+					'ldapauthentication-error-authentication-failed', $domain
 				)->text();
 			return false;
 		}
