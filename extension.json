@@ -10,10 +10,6 @@
 	"descriptionmsg": "ldapauthentication-desc",
 	"license-name": "GPL-2.0",
 	"type": "other",
-	"AutoloadNamespaces" : {
-		"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit/",
-		"MediaWiki\\Extension\\LDAPAuthentication\\" : "src/"
-	},
 	"requires": {
 		"extensions": {
 			"LDAPProvider": "*",
@@ -28,29 +24,18 @@
 	"ExtensionFunctions": [
 		"MediaWiki\\Extension\\LDAPAuthentication\\Setup::init"
 	],
-	"config_prefix": "",
 	"config": {
-		"LDAPAuthenticationAllowLocalLogin": {
-			"value": false,
-			"path": false,
-			"description": "Allow users without an LDAP-backed ID to log into the wiki.",
-			"public": true
-		},
-		"wgPluggableAuth_Class": {
-			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
-		}
+		"_prefix": "",
+		"LDAPAuthenticationAllowLocalLogin":  false,
+		"wgPluggableAuth_Class": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
 	},
-	"attributes": {
-		"LDAPProvider": {
-			"DefaultSettings": {
-				"authentication": {
-					"usernameattribute": "samaccountname",
-					"realnameattribute": "cn",
-					"emailattribute": "mail"
-				}
-			}
+	"LDAPProviderDefaultSettings": {
+		"authentication": {
+			"usernameattribute": "samaccountname",
+			"realnameattribute": "cn",
+			"emailattribute": "mail"
 		}
 	},
 	"load_composer_autoloader" : true,
-	"manifest_version": 2
+	"manifest_version": 1
 }
