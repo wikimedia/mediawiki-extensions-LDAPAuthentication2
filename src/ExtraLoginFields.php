@@ -3,27 +3,20 @@
 namespace MediaWiki\Extension\LDAPAuthentication;
 
 class ExtraLoginFields extends \ArrayObject {
+
 	const DOMAIN = 'domain';
 	const USERNAME = 'username';
 	const PASSWORD = 'password';
+
 	const DOMAIN_VALUE_LOCAL = 'local';
 
 	/**
-	 * @param array $domains to set up
+	 * @param array $configuredDomains to set up
+	 * @param Config $config Config for this extension
 	 */
-	public function __construct( array $domains ) {
-		$domainOptions = [];
-		foreach ( $domains as $domain ) {
-			$domainOptions[$domain] = new \RawMessage( $domain );
-		}
-		$domainOptions[static::DOMAIN_VALUE_LOCAL] = new \RawMessage( 'local' );
+	public function __construct( array $configuredDomains, $config ) {
 		parent::__construct( [
-			static::DOMAIN => [
-				'type' => 'select',
-				'label' => wfMessage( 'yourdomainname' ),
-				'help' => wfMessage( 'authmanager-domain-help' ),
-				'options' => $domainOptions
-			],
+			static::DOMAIN => $this->makeDomainFieldDescriptor( $configuredDomains, $config ),
 			static::USERNAME => [
 				'type' => 'string',
 				'label' => wfMessage( 'userlogin-yourname' ),
@@ -37,4 +30,30 @@ class ExtraLoginFields extends \ArrayObject {
 			]
 		] );
 	}
+
+	private function makeDomainFieldDescriptor(  $configuredDomains, $config ) {
+		if ( $config->get( 'AllowLocalLogin' ) ) {
+			$configuredDomains[] = static::DOMAIN_VALUE_LOCAL;
+		}
+
+		if ( count( $configuredDomains ) === 1 ) {
+			return [
+				'type' => 'hidden',
+				'value' => $configuredDomains[0]
+			];
+		}
+
+		$domainOptions = [];
+		foreach ( $configuredDomains as $domain ) {
+			$domainOptions[$domain] = new \RawMessage( $domain );
+		}
+
+		return [
+			'type' => 'select',
+			'label' => new \Message( 'yourdomainname' ),
+			'help' => new \Message( 'authmanager-domain-help' ),
+			'options' => $domainOptions
+		];
+	}
+
 }

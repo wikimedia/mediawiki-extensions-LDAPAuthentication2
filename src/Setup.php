@@ -10,7 +10,8 @@ class Setup {
 	 */
 	public static function init() {
 		$configuredDomains = DomainConfigFactory::getInstance()->getConfiguredDomains();
+		$config = Config::newInstance();
 		$GLOBALS['wgPluggableAuth_ExtraLoginFields']
-			= (array)( new ExtraLoginFields( $configuredDomains ) );
+			= (array)( new ExtraLoginFields( $configuredDomains, $config ) );
 	}
 }
