@@ -115,7 +115,7 @@ class PluggableAuth extends PluggableAuthBase {
 			return;
 		}
 		$userDomainStore = new UserDomainStore(
-			\MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer()
+			wfGetLB()
 		);
 
 		$userDomainStore->setDomainForUser(

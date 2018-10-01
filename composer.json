@@ -62,5 +62,11 @@
 			"minus-x fix .",
 			"phpcbf"
 		]
+	},
+	"autoload" : {
+		"psr-4": {
+			"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit",
+			"MediaWiki\\Extension\\LDAPAuthentication\\" : "src"
+		}
 	}
 }
