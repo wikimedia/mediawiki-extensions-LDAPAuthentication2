@@ -36,6 +36,12 @@
 			"description": "Allow users without an LDAP-backed ID to log into the wiki.",
 			"public": true
 		},
+		"LDAPAuthenticationUsernameNormalizer": {
+			"value": "",
+			"path": false,
+			"description": "Use this function for normalizing username for LDAP, for example 'strtolower'. Needed after migration from earlier Version.",
+			"public": true
+		},
 		"wgPluggableAuth_Class": {
 			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
 		}

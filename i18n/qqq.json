@@ -4,7 +4,10 @@
 			"Robert Vogel <vogel@hallowelt.com>"
 		]
 	},
-	"ldapauthentication-desc": "{{desc|name=LDAPAuthentication|url=https://www.mediawiki.org/wiki/Extension:LDAPAuthentication}}",
-	"ldapauthentication-error-authentication-failed": "Error message in case that a login attempt failed.\nParameters:\n* $1 - The selected domain",
-	"ldapauthentication-error-authentication-failed-userinfo": "Error message in case that no user info could be retrieved from LDAP"
+	"ldapauthentication-desc": "Allows authentication against a LDAP resource",
+	"ldapauthentication-error-authentication-failed": "Could not authenticate credentials against domain \"$1\"",
+	"ldapauthentication-error-authentication-failed-userinfo": "Could not fetch required user info to complete login",
+	"ldapauthentication-no-domain-chosen": "Please choose a valid domain",
+	"ldapauthentication-no-local-login": "Local logins are not allowed",
+	"ldapauthentication-error-local-authentication-failed": "Could not authenticate"
 }

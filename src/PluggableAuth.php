@@ -42,8 +42,17 @@ class PluggableAuth extends PluggableAuthBase {
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			if ( !$config->get( "AllowLocalLogin" ) ) {
 				$errorMessage = wfMessage( 'ldapauthentication-no-local-login' )->plain();
+				return false;
 			}
-			return true;
+			// Validate local user the mediawiki way
+			$user = \User::newFromName( $username );
+			$user->load();
+			if ( ($user->getId() > 0) && ($user->isValidPassword( $password )) ) {
+				return true;
+			} else {
+				$errorMessage = wfMessage( 'ldapauthentication-error-local-authentication-failed' )->plain();
+				return false;
+			}
 		}
 
 		$ldapClient = null;
@@ -65,7 +74,12 @@ class PluggableAuth extends PluggableAuthBase {
 			$result = $ldapClient->getUserInfo( $username );
 			$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
 			$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
-			$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )];
+			// maybe there are no emails stored in LDAP, this prevents php notices:
+			if ( isset( $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ) ) {
+				$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )];
+			} else {
+				$email = '';
+			}
 		} catch ( Exception $ex ) {
 			$errorMessage =
 				wfMessage(
@@ -73,6 +87,15 @@ class PluggableAuth extends PluggableAuthBase {
 					$domain
 				)->text();
 			return false;
+		}
+
+		/* this is a feature after updating wikis which used strtolower on usernames.
+		 * to use it, set this in LocalSettings.php:
+		 * $LDAPAuthenticationUsernameNormalizer = 'strtolower';
+		 */
+		$normalizer = $config->get( "UsernameNormalizer" );
+		if ( !empty( $normalizer ) && is_callable( $normalizer ) ) {
+			$username = call_user_func( $normalizer, $username );
 		}
 
 		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
