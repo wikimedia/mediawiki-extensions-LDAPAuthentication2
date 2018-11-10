@@ -8,5 +8,6 @@
 	"ldapauthentication-error-authentication-failed": "Could not authenticate credentials against domain \"$1\"",
 	"ldapauthentication-error-authentication-failed-userinfo": "Could not fetch required user info to complete login",
 	"ldapauthentication-no-domain-chosen": "Please choose a valid domain",
-	"ldapauthentication-no-local-login": "Local logins are not allowed"
+	"ldapauthentication-no-local-login": "Local logins are not allowed",
+	"ldapauthentication-error-local-authentication-failed": "Could not authenticate"
 }
