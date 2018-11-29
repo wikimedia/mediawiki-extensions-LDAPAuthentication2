@@ -1,4 +1,4 @@
-== Extension:LDAPAuthentication ==
+== Extension:LDAPAuthentication2 ==
 
 This extension provides a way to authenticate users against an LDAP store.
 

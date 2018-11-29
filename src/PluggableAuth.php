@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extension\LDAPAuthentication2;
 
 use Exception;
 use MediaWiki\Auth\AuthManager;
@@ -41,16 +41,16 @@ class PluggableAuth extends PluggableAuthBase {
 
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			if ( !$config->get( "AllowLocalLogin" ) ) {
-				$errorMessage = wfMessage( 'ldapauthentication-no-local-login' )->plain();
+				$errorMessage = wfMessage( 'ldapauthentication2-no-local-login' )->plain();
 				return false;
 			}
 			// Validate local user the mediawiki way
 			$user = \User::newFromName( $username );
 			$user->load();
-			if ( ($user->getId() > 0) && ($user->isValidPassword( $password )) ) {
+			if ( ( $user->getId() > 0 ) && ( $user->isValidPassword( $password ) ) ) {
 				return true;
 			} else {
-				$errorMessage = wfMessage( 'ldapauthentication-error-local-authentication-failed' )->plain();
+				$errorMessage = wfMessage( 'ldapauthentication2-error-local-authentication-failed' )->plain();
 				return false;
 			}
 		}
@@ -59,14 +59,14 @@ class PluggableAuth extends PluggableAuthBase {
 		try {
 			$ldapClient = ClientFactory::getInstance()->getForDomain( $domain );
 		} catch ( NoDomain $e ) {
-			$errorMessage = wfMessage( 'ldapauthentication-no-domain-chosen' )->plain();
+			$errorMessage = wfMessage( 'ldapauthentication2-no-domain-chosen' )->plain();
 			return false;
 		}
 
 		if ( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage =
 				wfMessage(
-					'ldapauthentication-error-authentication-failed', $domain
+					'ldapauthentication2-error-authentication-failed', $domain
 				)->text();
 			return false;
 		}
@@ -83,7 +83,7 @@ class PluggableAuth extends PluggableAuthBase {
 		} catch ( Exception $ex ) {
 			$errorMessage =
 				wfMessage(
-					'ldapauthentication-error-authentication-failed-userinfo',
+					'ldapauthentication2-error-authentication-failed-userinfo',
 					$domain
 				)->text();
 			return false;
@@ -91,7 +91,7 @@ class PluggableAuth extends PluggableAuthBase {
 
 		/* this is a feature after updating wikis which used strtolower on usernames.
 		 * to use it, set this in LocalSettings.php:
-		 * $LDAPAuthenticationUsernameNormalizer = 'strtolower';
+		 * $LDAPAuthentication2UsernameNormalizer = 'strtolower';
 		 */
 		$normalizer = $config->get( "UsernameNormalizer" );
 		if ( !empty( $normalizer ) && is_callable( $normalizer ) ) {
@@ -132,7 +132,7 @@ class PluggableAuth extends PluggableAuthBase {
 		if ( $domain === null ) {
 			if ( !$config->get( "AllowLocalLogin" ) ) {
 				throw new MWException(
-					wfMessage( 'ldapauthentication-no-local-login' )->plain()
+					wfMessage( 'ldapauthentication2-no-local-login' )->plain()
 				);
 			}
 			return;

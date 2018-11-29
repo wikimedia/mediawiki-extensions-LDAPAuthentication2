@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extension\LDAPAuthentication2;
 
 use MediaWiki\Extension\LDAPProvider\DomainConfigFactory;
 

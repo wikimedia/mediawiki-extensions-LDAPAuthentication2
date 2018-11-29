@@ -1,49 +1,49 @@
 {
-	"name": "LDAPAuthentication",
+	"name": "LDAPAuthentication2",
 	"version": "1.0.0-alpha",
 	"author": [
 		"Cindy Cicalese",
 		"[http://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
 		"[http://mediawiki.org/wiki/User:Osnard Robert Vogel]"
 	],
-	"url": "https://www.mediawiki.org/wiki/Extension:LDAPAuthentication",
-	"descriptionmsg": "ldapauthentication-desc",
+	"url": "https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2",
+	"descriptionmsg": "ldapauthentication2-desc",
 	"license-name": "GPL-2.0",
 	"type": "other",
 	"AutoloadNamespaces" : {
-		"MediaWiki\\Extension\\LDAPAuthentication\\Tests\\" : "tests/phpunit/",
-		"MediaWiki\\Extension\\LDAPAuthentication\\" : "src/"
+		"MediaWiki\\Extension\\LDAPAuthentication2\\Tests\\" : "tests/phpunit/",
+		"MediaWiki\\Extension\\LDAPAuthentication2\\" : "src/"
 	},
 	"requires": {
 		"extensions": {
-			"LDAPProvider": "*",
+			"LDAPProvider": "1.*",
 			"PluggableAuth": "*"
 		}
 	},
 	"MessagesDirs": {
-		"LDAPAuthentication": [
+		"LDAPAuthentication2": [
 			"i18n"
 		]
 	},
 	"ExtensionFunctions": [
-		"MediaWiki\\Extension\\LDAPAuthentication\\Setup::init"
+		"MediaWiki\\Extension\\LDAPAuthentication2\\Setup::init"
 	],
 	"config_prefix": "",
 	"config": {
-		"LDAPAuthenticationAllowLocalLogin": {
+		"LDAPAuthentication2AllowLocalLogin": {
 			"value": false,
 			"path": false,
 			"description": "Allow users without an LDAP-backed ID to log into the wiki.",
 			"public": true
 		},
-		"LDAPAuthenticationUsernameNormalizer": {
+		"LDAPAuthentication2UsernameNormalizer": {
 			"value": "",
 			"path": false,
 			"description": "Use this function for normalizing username for LDAP, for example 'strtolower'. Needed after migration from earlier Version.",
 			"public": true
 		},
 		"wgPluggableAuth_Class": {
-			"value": "MediaWiki\\Extension\\LDAPAuthentication\\PluggableAuth"
+			"value": "MediaWiki\\Extension\\LDAPAuthentication2\\PluggableAuth"
 		}
 	},
 	"attributes": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extension\LDAPAuthentication2;
 
 use GlobalVarConfig;
 
@@ -8,7 +8,7 @@ class Config extends GlobalVarConfig {
 	const VERSION = "1.0.0-alpha";
 
 	public function __construct() {
-		parent::__construct( 'LDAPAuthentication' );
+		parent::__construct( 'LDAPAuthentication2' );
 	}
 
 	/**

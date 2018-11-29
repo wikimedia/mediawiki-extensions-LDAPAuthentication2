@@ -1,6 +1,6 @@
 <?php
 
-namespace MediaWiki\Extension\LDAPAuthentication;
+namespace MediaWiki\Extension\LDAPAuthentication2;
 
 class ExtraLoginFields extends \ArrayObject {
 
@@ -31,7 +31,7 @@ class ExtraLoginFields extends \ArrayObject {
 		] );
 	}
 
-	private function makeDomainFieldDescriptor(  $configuredDomains, $config ) {
+	private function makeDomainFieldDescriptor( $configuredDomains, $config ) {
 		if ( $config->get( 'AllowLocalLogin' ) ) {
 			$configuredDomains[] = static::DOMAIN_VALUE_LOCAL;
 		}

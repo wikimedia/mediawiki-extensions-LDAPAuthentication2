@@ -4,10 +4,10 @@
 			"Robert Vogel <vogel@hallowelt.com>"
 		]
 	},
-	"ldapauthentication-desc": "Allows authentication against a LDAP resource",
-	"ldapauthentication-error-authentication-failed": "Could not authenticate credentials against domain \"$1\"",
-	"ldapauthentication-error-authentication-failed-userinfo": "Could not fetch required user info to complete login",
-	"ldapauthentication-no-domain-chosen": "Please choose a valid domain",
-	"ldapauthentication-no-local-login": "Local logins are not allowed",
-	"ldapauthentication-error-local-authentication-failed": "Could not authenticate"
+	"ldapauthentication2-desc": "Allows authentication against a LDAP resource",
+	"ldapauthentication2-error-authentication-failed": "Could not authenticate credentials against domain \"$1\"",
+	"ldapauthentication2-error-authentication-failed-userinfo": "Could not fetch required user info to complete login",
+	"ldapauthentication2-no-domain-chosen": "Please choose a valid domain",
+	"ldapauthentication2-no-local-login": "Local logins are not allowed",
+	"ldapauthentication2-error-local-authentication-failed": "Could not authenticate"
 }
