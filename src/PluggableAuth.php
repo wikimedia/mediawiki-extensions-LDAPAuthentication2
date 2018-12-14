@@ -11,7 +11,6 @@ use MediaWiki\Extension\LDAPProvider\UserDomainStore;
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
 use User;
-use MWException;
 
 class PluggableAuth extends PluggableAuthBase {
 
@@ -130,12 +129,12 @@ class PluggableAuth extends PluggableAuthBase {
 		);
 		$config = Config::newInstance();
 
+		/**
+		 * This can happen, when user account creation was initiated by a foreign source
+		 * (e.g Auth_remoteuser). There is no way of knowing the domain at this point.
+		 * This can also not be a local login attempt as it would be catched in `authenticate`.
+		 */
 		if ( $domain === null ) {
-			if ( !$config->get( "AllowLocalLogin" ) ) {
-				throw new MWException(
-					wfMessage( 'ldapauthentication2-no-local-login' )->plain()
-				);
-			}
 			return;
 		}
 		$userDomainStore = new UserDomainStore(
