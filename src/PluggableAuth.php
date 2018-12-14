@@ -11,6 +11,7 @@ use MediaWiki\Extension\LDAPProvider\UserDomainStore;
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
 use User;
+use MWException;
 
 class PluggableAuth extends PluggableAuthBase {
 
