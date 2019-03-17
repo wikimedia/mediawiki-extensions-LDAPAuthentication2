@@ -8,6 +8,7 @@ use MediaWiki\Extension\LDAPProvider\ClientConfig;
 use MediaWiki\Extension\LDAPProvider\ClientFactory;
 use MediaWiki\Extension\LDAPProvider\LDAPNoDomainConfigException as NoDomain;
 use MediaWiki\Extension\LDAPProvider\UserDomainStore;
+use MediaWiki\MediaWikiServices;
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
 use User;
@@ -47,12 +48,12 @@ class PluggableAuth extends PluggableAuthBase {
 			// Validate local user the mediawiki way
 			$user = \User::newFromName( $username );
 			$user->load();
-			if ( ( $user->getId() > 0 ) && ( $user->isValidPassword( $password ) ) ) {
+			if ( ( $user->getId() > 0 ) && $user->isValidPassword( $password ) ) {
 				return true;
-			} else {
-				$errorMessage = wfMessage( 'ldapauthentication2-error-local-authentication-failed' )->plain();
-				return false;
 			}
+
+			$errorMessage = wfMessage( 'ldapauthentication2-error-local-authentication-failed' )->plain();
+			return false;
 		}
 
 		$ldapClient = null;
@@ -75,11 +76,7 @@ class PluggableAuth extends PluggableAuthBase {
 			$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
 			$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
 			// maybe there are no emails stored in LDAP, this prevents php notices:
-			if ( isset( $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ) ) {
-				$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )];
-			} else {
-				$email = '';
-			}
+			$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ?? '';
 		} catch ( Exception $ex ) {
 			$errorMessage =
 				wfMessage(
@@ -89,6 +86,7 @@ class PluggableAuth extends PluggableAuthBase {
 			return false;
 		}
 
+		/**
 		/* this is a feature after updating wikis which used strtolower on usernames.
 		 * to use it, set this in LocalSettings.php:
 		 * $LDAPAuthentication2UsernameNormalizer = 'strtolower';
@@ -98,6 +96,7 @@ class PluggableAuth extends PluggableAuthBase {
 			$username = call_user_func( $normalizer, $username );
 		}
 
+		/**
 		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
 		 * being called before PluggableAuth::saveExtraAttributes (see below)
 		 * we can not rely on LdapProvider\UserDomainStore here. Further
@@ -127,7 +126,6 @@ class PluggableAuth extends PluggableAuthBase {
 		$domain = $authManager->getAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY
 		);
-		$config = Config::newInstance();
 
 		/**
 		 * This can happen, when user account creation was initiated by a foreign source
@@ -138,7 +136,7 @@ class PluggableAuth extends PluggableAuthBase {
 			return;
 		}
 		$userDomainStore = new UserDomainStore(
-			\MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer()
+			MediaWikiServices::getInstance()->getDBLoadBalancer()
 		);
 
 		$userDomainStore->setDomainForUser(
