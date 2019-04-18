@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"author": [
 		"Cindy Cicalese",
-		"[http://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
-		"[http://mediawiki.org/wiki/User:Osnard Robert Vogel]"
+		"[https://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
+		"[https://mediawiki.org/wiki/User:Osnard Robert Vogel]"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:LDAPAuthentication2",
 	"descriptionmsg": "ldapauthentication2-desc",
