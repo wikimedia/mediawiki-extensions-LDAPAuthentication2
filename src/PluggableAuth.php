@@ -40,6 +40,17 @@ class PluggableAuth extends PluggableAuthBase {
 
 		$config = Config::newInstance();
 
+		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
+		 * being called before PluggableAuth::saveExtraAttributes (see below)
+		 * we can not rely on LdapProvider\UserDomainStore here. Further
+		 * complicating things, we can not persist the domain here, as the
+		 * user id may be null (first login)
+		 */
+		$authManager->setAuthenticationSessionData(
+			static::DOMAIN_SESSION_KEY,
+			$domain
+		);
+
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			if ( !$config->get( "AllowLocalLogin" ) ) {
 				$errorMessage = wfMessage( 'ldapauthentication2-no-local-login' )->plain();
@@ -96,17 +107,6 @@ class PluggableAuth extends PluggableAuthBase {
 			$username = call_user_func( $normalizer, $username );
 		}
 
-		/**
-		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
-		 * being called before PluggableAuth::saveExtraAttributes (see below)
-		 * we can not rely on LdapProvider\UserDomainStore here. Further
-		 * complicating things, we can not persist the domain here, as the
-		 * user id may be null (first login)
-		 */
-		$authManager->setAuthenticationSessionData(
-			static::DOMAIN_SESSION_KEY,
-			$domain
-		);
 		return true;
 	}
 
