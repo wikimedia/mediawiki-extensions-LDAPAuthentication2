@@ -98,7 +98,7 @@ class PluggableAuth extends PluggableAuthBase {
 		}
 
 		/**
-		/* this is a feature after updating wikis which used strtolower on usernames.
+		 * this is a feature after updating wikis which used strtolower on usernames.
 		 * to use it, set this in LocalSettings.php:
 		 * $LDAPAuthentication2UsernameNormalizer = 'strtolower';
 		 */
