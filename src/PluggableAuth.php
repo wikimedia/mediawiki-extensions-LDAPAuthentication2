@@ -94,11 +94,15 @@ class PluggableAuth extends PluggableAuthBase {
 					'ldapauthentication2-error-authentication-failed-userinfo',
 					$domain
 				)->text();
+
+			wfDebugLog( 'LDAPAuthentication2', "Error fetching userinfo: {$ex->getMessage()}" );
+			wfDebugLog( 'LDAPAuthentication2', $ex->getTraceAsString() );
+
 			return false;
 		}
 
 		/**
-		/* this is a feature after updating wikis which used strtolower on usernames.
+		 * this is a feature after updating wikis which used strtolower on usernames.
 		 * to use it, set this in LocalSettings.php:
 		 * $LDAPAuthentication2UsernameNormalizer = 'strtolower';
 		 */
