@@ -10,8 +10,10 @@
 	"descriptionmsg": "ldapauthentication2-desc",
 	"license-name": "GPL-2.0",
 	"type": "other",
-	"AutoloadNamespaces" : {
-		"MediaWiki\\Extension\\LDAPAuthentication2\\" : "src/",
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\LDAPAuthentication2\\" : "src/"
+	},
+	"TestAutoloadNamespaces": {
 		"MediaWiki\\Extension\\LDAPAuthentication2\\Tests\\" : "tests/phpunit/"
 	},
 	"requires": {
