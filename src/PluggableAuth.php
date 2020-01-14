@@ -150,7 +150,7 @@ class PluggableAuth extends PluggableAuthBase {
 	/**
 	 * @param string $username
 	 * @param string $password
-	 * @return boolean
+	 * @return bool
 	 */
 	private function checkLocalPassword( $username, $password ) {
 		$user = User::newFromName( $username );
