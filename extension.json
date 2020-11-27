@@ -1,6 +1,6 @@
 {
 	"name": "LDAPAuthentication2",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": [
 		"Cindy Cicalese",
 		"[http://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
@@ -28,6 +28,9 @@
 	"ExtensionFunctions": [
 		"MediaWiki\\Extension\\LDAPAuthentication2\\Setup::init"
 	],
+	"Hooks": {
+		"BeforePageDisplay": "MediaWiki\\Extension\\LDAPAuthentication2\\Setup::onBeforePageDisplay"
+	},
 	"config_prefix": "",
 	"config": {
 		"LDAPAuthentication2AllowLocalLogin": {
