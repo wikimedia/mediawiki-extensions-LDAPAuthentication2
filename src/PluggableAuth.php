@@ -114,6 +114,11 @@ class PluggableAuth extends PluggableAuthBase {
 			$username = call_user_func( $normalizer, $username );
 		}
 
+		$user = User::newFromName( $username );
+		if ( $user !== false && $user->getId() !== 0 ) {
+			$id = $user->getId();
+		}
+
 		return true;
 	}
 
