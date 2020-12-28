@@ -9,6 +9,7 @@ use MediaWiki\Extension\LDAPProvider\ClientFactory;
 use MediaWiki\Extension\LDAPProvider\LDAPNoDomainConfigException as NoDomain;
 use MediaWiki\Extension\LDAPProvider\UserDomainStore;
 use MediaWiki\MediaWikiServices;
+use MWException;
 use PluggableAuth as PluggableAuthBase;
 use PluggableAuthLogin;
 use User;
@@ -38,20 +39,73 @@ class PluggableAuth extends PluggableAuthBase {
 		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
 		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
 
-		$config = Config::newInstance();
+		$isLocal = $this->maybeLocalLogin( $domain, $username, $password, $id, $errorMessage );
+		if ( $isLocal !== null ) {
+			return $isLocal;
+		}
 
-		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
-		 * being called before PluggableAuth::saveExtraAttributes (see below)
-		 * we can not rely on LdapProvider\UserDomainStore here. Further
-		 * complicating things, we can not persist the domain here, as the
-		 * user id may be null (first login)
+		if ( !$this->checkLDAPLogin(
+			$domain, $username, $password, $realname, $email, $errorMessage
+		) ) {
+			return false;
+		}
+
+		$username = $this->normalizeUsername( $username );
+		$user = User::newFromName( $username );
+		if ( $user !== false && $user->getId() !== 0 ) {
+			$id = $user->getId();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Normalize usernames as desired.
+	 *
+	 * @param string $username to normalize
+	 * @return string username with any normalization
+	 */
+	protected function normalizeUsername( $username ) {
+		/**
+		 * this is a feature after updating wikis which used strtolower on usernames.
+		 * to use it, set this in LocalSettings.php:
+		 * $LDAPAuthentication2UsernameNormalizer = 'strtolower';
 		 */
-		$authManager->setAuthenticationSessionData(
-			static::DOMAIN_SESSION_KEY,
-			$domain
-		);
+		$config = Config::newInstance();
+		$normalizer = $config->get( "UsernameNormalizer" );
+		if ( !empty( $normalizer ) ) {
+			if ( !is_callable( $normalizer ) ) {
+				throw new MWException(
+					"The UsernameNormalizer for LDAPAuthentiation2 should be callable"
+				);
+			}
+			$username = call_user_func( $normalizer, $username );
+		}
+		return $username;
+	}
 
+	/**
+	 * If a local login is attempted, see if they're allowed, try it if they
+	 * are, and return success or faillure.  Otherwise, if no local login is
+	 * attempted, return null.
+	 *
+	 * @param string $domain we are logging into
+	 * @param string $username for the user
+	 * @param string $password for the user
+	 * @param int &$id value of id
+	 * @param string &$errorMessage any error message for the user
+	 *
+	 * @return ?bool
+	 */
+	protected function maybeLocalLogin(
+		$domain,
+		$username,
+		$password,
+		&$id,
+		&$errorMessage
+	) {
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
+			$config = Config::newInstance();
 			if ( !$config->get( "AllowLocalLogin" ) ) {
 				$errorMessage = wfMessage( 'ldapauthentication2-no-local-login' )->plain();
 				return false;
@@ -63,9 +117,47 @@ class PluggableAuth extends PluggableAuthBase {
 				return true;
 			}
 
-			$errorMessage = wfMessage( 'ldapauthentication2-error-local-authentication-failed' )->plain();
+			$errorMessage = wfMessage(
+				'ldapauthentication2-error-local-authentication-failed'
+			)->plain();
 			return false;
 		}
+
+		return null;
+	}
+
+	/**
+	 * Attempt a login and get info (realname, username) from LDAP
+	 *
+	 * @param string $domain
+	 * @param string &$username username used for binding is passed in, but
+	 *     chosen attribute is returned here
+	 * @param string $password
+	 * @param string &$realname Real name from LDAP
+	 * @param string &$email for the user from LDAP
+	 * @param string &$errorMessage any error message for the user
+	 *
+	 * @return ?bool
+	 */
+	protected function checkLDAPLogin(
+		$domain,
+		&$username,
+		$password,
+		&$realname,
+		&$email,
+		&$errorMessage
+	) {
+		/* This is a workaround: As "PluggableAuthUserAuthorization" hook is
+		 * being called before PluggableAuth::saveExtraAttributes (see below)
+		 * we can not rely on LdapProvider\UserDomainStore here. Further
+		 * complicating things, we can not persist the domain here, as the
+		 * user id may be null (first login)
+		 */
+		$authManager = $this->getAuthManager();
+		$authManager->setAuthenticationSessionData(
+			static::DOMAIN_SESSION_KEY,
+			$domain
+		);
 
 		$ldapClient = null;
 		try {
@@ -76,10 +168,9 @@ class PluggableAuth extends PluggableAuthBase {
 		}
 
 		if ( !$ldapClient->canBindAs( $username, $password ) ) {
-			$errorMessage =
-				wfMessage(
-					'ldapauthentication2-error-authentication-failed', $domain
-				)->text();
+			$errorMessage = wfMessage(
+				'ldapauthentication2-error-authentication-failed', $domain
+			)->text();
 			return false;
 		}
 		try {
@@ -89,31 +180,14 @@ class PluggableAuth extends PluggableAuthBase {
 			// maybe there are no emails stored in LDAP, this prevents php notices:
 			$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ?? '';
 		} catch ( Exception $ex ) {
-			$errorMessage =
-				wfMessage(
-					'ldapauthentication2-error-authentication-failed-userinfo',
-					$domain
-				)->text();
+			$errorMessage = wfMessage(
+				'ldapauthentication2-error-authentication-failed-userinfo', $domain
+			)->text();
 
 			wfDebugLog( 'LDAPAuthentication2', "Error fetching userinfo: {$ex->getMessage()}" );
 			wfDebugLog( 'LDAPAuthentication2', $ex->getTraceAsString() );
 
 			return false;
-		}
-
-		/**
-		 * this is a feature after updating wikis which used strtolower on usernames.
-		 * to use it, set this in LocalSettings.php:
-		 * $LDAPAuthentication2UsernameNormalizer = 'strtolower';
-		 */
-		$normalizer = $config->get( "UsernameNormalizer" );
-		if ( !empty( $normalizer ) && is_callable( $normalizer ) ) {
-			$username = call_user_func( $normalizer, $username );
-		}
-
-		$user = User::newFromName( $username );
-		if ( $user !== false && $user->getId() !== 0 ) {
-			$id = $user->getId();
 		}
 
 		return true;
@@ -139,7 +213,7 @@ class PluggableAuth extends PluggableAuthBase {
 		/**
 		 * This can happen, when user account creation was initiated by a foreign source
 		 * (e.g Auth_remoteuser). There is no way of knowing the domain at this point.
-		 * This can also not be a local login attempt as it would be catched in `authenticate`.
+		 * This can also not be a local login attempt as it would be caught in `authenticate`.
 		 */
 		if ( $domain === null ) {
 			return;
@@ -161,7 +235,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @param string $password
 	 * @return ?User
 	 */
-	private function checkLocalPassword( $username, $password ) {
+	protected function checkLocalPassword( $username, $password ) {
 		$user = User::newFromName( $username );
 		$services = MediaWikiServices::getInstance();
 		$passwordFactory = $services->getPasswordFactory();
