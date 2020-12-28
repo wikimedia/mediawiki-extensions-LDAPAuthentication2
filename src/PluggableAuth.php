@@ -30,7 +30,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @SuppressWarnings( ShortVariable )
 	 */
 	public function authenticate( &$id, &$username, &$realname, &$email, &$errorMessage ) {
-		$authManager = AuthManager::singleton();
+		$authManager = $this->getAuthManager();
 		$extraLoginFields = $authManager->getAuthenticationSessionData(
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
@@ -132,7 +132,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @param int $userId for user
 	 */
 	public function saveExtraAttributes( $userId ) {
-		$authManager = AuthManager::singleton();
+		$authManager = $this->getAuthManager();
 		$domain = $authManager->getAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY
 		);
@@ -173,5 +173,20 @@ class PluggableAuth extends PluggableAuthBase {
 		$passwordInDB = $passwordFactory->newFromCiphertext( $row->user_password );
 
 		return $passwordInDB->equals( $password ) ? $user : null;
+	}
+
+	/**
+	 * Provide a getter for the AuthManager to abstract out version checking.
+	 *
+	 * @return AuthManager
+	 */
+	protected function getAuthManager() {
+		if ( method_exists( MediaWikiServices::class, 'getAuthManager' ) ) {
+			// MediaWiki 1.35+
+			$authManager = MediaWikiServices::getInstance()->getAuthManager();
+		} else {
+			$authManager = AuthManager::singleton();
+		}
+		return $authManager;
 	}
 }
