@@ -62,7 +62,9 @@ class PluggableAuth extends PluggableAuthBase {
 				return false;
 			}
 			// Validate local user the mediawiki way
-			if ( $this->checkLocalPassword( $username, $password ) ) {
+			$user = $this->checkLocalPassword( $username, $password );
+			if ( $user ) {
+				$id = $user->getId();
 				return true;
 			}
 
@@ -163,9 +165,11 @@ class PluggableAuth extends PluggableAuthBase {
 	}
 
 	/**
+	 * Return user if the authentication is successful, null otherwise.
+	 *
 	 * @param string $username
 	 * @param string $password
-	 * @return bool
+	 * @return ?User
 	 */
 	private function checkLocalPassword( $username, $password ) {
 		$user = User::newFromName( $username );
@@ -176,6 +180,6 @@ class PluggableAuth extends PluggableAuthBase {
 		$row = $dbr->selectRow( 'user', 'user_password', [ 'user_name' => $user->getName() ] );
 		$passwordInDB = $passwordFactory->newFromCiphertext( $row->user_password );
 
-		return $passwordInDB->verify( $password );
+		return $passwordInDB->verify( $password ) ? $user : null;
 	}
 }
