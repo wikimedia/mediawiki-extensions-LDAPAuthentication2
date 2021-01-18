@@ -91,7 +91,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 * attempted, return null.
 	 *
 	 * @param string $domain we are logging into
-	 * @param string $username for the user
+	 * @param string &$username for the user
 	 * @param string $password for the user
 	 * @param int &$id value of id
 	 * @param string &$errorMessage any error message for the user
@@ -100,7 +100,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 */
 	protected function maybeLocalLogin(
 		$domain,
-		$username,
+		&$username,
 		$password,
 		&$id,
 		&$errorMessage
@@ -115,6 +115,7 @@ class PluggableAuth extends PluggableAuthBase {
 			$user = $this->checkLocalPassword( $username, $password );
 			if ( $user ) {
 				$id = $user->getId();
+				$username = $user->getName();
 				return true;
 			}
 
