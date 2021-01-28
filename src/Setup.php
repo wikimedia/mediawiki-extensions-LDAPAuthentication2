@@ -21,7 +21,6 @@ class Setup {
 	 *
 	 * @param OutputPage $out
 	 * @param Skin $skin
-	 * @return void
 	 */
 	public static function onBeforePageDisplay( $out, $skin ) {
 		/**
@@ -35,6 +34,5 @@ class Setup {
 		if ( $out->getTitle()->isSpecial( 'Userlogin' ) && $config->get( 'AllowLocalLogin' ) ) {
 			$out->addInlineStyle( '#wpLoginAttempt { display: none; }' );
 		}
-		return true;
 	}
 }
