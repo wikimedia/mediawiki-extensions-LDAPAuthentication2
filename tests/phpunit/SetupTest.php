@@ -17,7 +17,7 @@ class SetupTest extends MediaWikiTestCase {
 	public function testInit() {
 		$this->setMwGlobals( [
 			'wgPluggableAuth_ExtraLoginFields' => [],
-			'LDAPProviderDomainConfigProvider' => function () {
+			'LDAPProviderDomainConfigProvider' => static function () {
 				$config = [ 'hw.local' => [] ];
 				return new InlinePHPArray( $config );
 			}
