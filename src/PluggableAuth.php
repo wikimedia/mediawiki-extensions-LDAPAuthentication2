@@ -17,6 +17,8 @@ use User;
 class PluggableAuth extends PluggableAuthBase {
 
 	const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
+	
+	private $default_login = false;
 
 	/**
 	 * Authenticates against LDAP
@@ -31,13 +33,44 @@ class PluggableAuth extends PluggableAuthBase {
 	 */
 	public function authenticate( &$id, &$username, &$realname, &$email, &$errorMessage ) {
 		$authManager = $this->getAuthManager();
+
+		$config = Config::newInstance();
+		$sslconfig = $config::getSSLConfig();
+
 		$extraLoginFields = $authManager->getAuthenticationSessionData(
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
 		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN];
-		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
-		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
+		$password = null;
+		$username = null;
+		
+		if ($sslconfig->enabled)
+		{
+			if ($config::getSSLUsername())
+			{
+				if ($sslconfig->requirePassword)
+					$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
+				else
+					$password = null;
+				
+				$username = $extraLoginFields[ExtraLoginFields::SSLUSER];
+			}
+			else
+			{
+				$this->default_login = true;
+			}
+		}
+		else
+		{
+			$this->default_login = true;
+		}
+		
+		if ($this->default_login)
+		{
+			$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
+			$username = $extraLoginFields[ExtraLoginFields::USERNAME];
+		}
 
 		$isLocal = $this->maybeLocalLogin( $domain, $username, $password, $id, $errorMessage );
 		if ( $isLocal !== null ) {
@@ -106,18 +139,38 @@ class PluggableAuth extends PluggableAuthBase {
 	) {
 		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
 			$config = Config::newInstance();
+			$sslconfig = $config::getSSLConfig();			
 			if ( !$config->get( "AllowLocalLogin" ) ) {
 				$errorMessage = wfMessage( 'ldapauthentication2-no-local-login' )->plain();
 				return false;
 			}
-			// Validate local user the mediawiki way
-			$user = $this->checkLocalPassword( $username, $password );
+			
+			if (!$this->default_login)
+			{
+				if ($sslconfig->enabled)
+				{
+					if ($username != $config::getSSLUsername())
+						return false;
+				}
+			}
+
+			if (($sslconfig->enabled) && (!$sslconfig->requirePassword) && (!$this->default_login))
+			{
+				// Passwordless login via SSL client cert
+				$user = User::newFromName( $username );				
+			}
+			else
+			{
+				// Validate local user the mediawiki way
+				$user = $this->checkLocalPassword( $username, $password );
+			}
+
 			if ( $user ) {
 				$id = $user->getId();
 				$username = $user->getName();
 				return true;
 			}
-
+			
 			$errorMessage = wfMessage(
 				'ldapauthentication2-error-local-authentication-failed'
 			)->plain();
@@ -168,12 +221,28 @@ class PluggableAuth extends PluggableAuthBase {
 			return false;
 		}
 
-		if ( !$ldapClient->canBindAs( $username, $password ) ) {
-			$errorMessage = wfMessage(
-				'ldapauthentication2-error-authentication-failed', $domain
-			)->text();
-			return false;
+		$config = Config::newInstance();
+		$sslconfig = $config::getSSLConfig();
+		
+		if (!$this->default_login)
+		{
+			if ($sslconfig->enabled)
+			{
+				if ($username != $config::getSSLUsername())
+					return false;
+			}
+		}			
+
+		if ((($sslconfig->enabled) && ($sslconfig->requirePassword)) || (!$sslconfig->enabled) || ($this->default_login))
+		{
+			if ( !$ldapClient->canBindAs( $username, $password ) ) {
+				$errorMessage = wfMessage(
+					'ldapauthentication2-error-authentication-failed', $domain
+				)->text();
+				return false;
+			}
 		}
+
 		try {
 			$result = $ldapClient->getUserInfo( $username );
 			$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
