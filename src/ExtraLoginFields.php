@@ -39,7 +39,9 @@ class ExtraLoginFields extends \ArrayObject {
 		if ( count( $configuredDomains ) === 1 ) {
 			return [
 				'type' => 'hidden',
-				'value' => $configuredDomains[0]
+				'value' => $configuredDomains[0],
+				'label' => new \Message( 'yourdomainname' ),
+				'help' => new \Message( 'authmanager-domain-help' )
 			];
 		}
 
