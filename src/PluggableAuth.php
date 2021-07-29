@@ -20,6 +20,13 @@ class PluggableAuth extends PluggableAuthBase {
 	const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
 
 	/**
+	 * AuthManager instance to manage authentication session data
+	 *
+	 * @var AuthManager
+	 */
+	private $authManager;
+
+	/**
 	 * Authenticates against LDAP
 	 * @param int &$id not used
 	 * @param string &$username set to username
@@ -31,8 +38,8 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @SuppressWarnings( ShortVariable )
 	 */
 	public function authenticate( &$id, &$username, &$realname, &$email, &$errorMessage ) {
-		$authManager = $this->getAuthManager();
-		$extraLoginFields = $authManager->getAuthenticationSessionData(
+		$this->authManager = $this->getAuthManager();
+		$extraLoginFields = $this->authManager->getAuthenticationSessionData(
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
@@ -116,6 +123,12 @@ class PluggableAuth extends PluggableAuthBase {
 			if ( $user ) {
 				$id = $user->getId();
 				$username = $user->getName();
+
+				$this->authManager->setAuthenticationSessionData(
+					static::DOMAIN_SESSION_KEY,
+					$domain
+				);
+
 				return true;
 			}
 
