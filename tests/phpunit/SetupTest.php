@@ -4,12 +4,12 @@ namespace MediaWiki\Extension\LDAPAuthentication2\Tests;
 
 use MediaWiki\Extension\LDAPAuthentication2\Setup;
 use MediaWiki\Extension\LDAPProvider\DomainConfigProvider\InlinePHPArray;
-use MediaWikiTestCase;
+use MediaWikiIntegrationTestCase;
 
 /**
  * @coversDefaultClass MediaWiki\Extension\LDAPAuthentication2\Setup
  */
-class SetupTest extends MediaWikiTestCase {
+class SetupTest extends MediaWikiIntegrationTestCase {
 
 	/**
 	 * @covers MediaWiki\Extension\LDAPAuthentication2\Setup::init
