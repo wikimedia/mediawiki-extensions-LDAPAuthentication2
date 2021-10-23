@@ -253,8 +253,12 @@ class PluggableAuth extends PluggableAuthBase {
 	protected function checkLocalPassword( $username, $password ) {
 		$user = User::newFromName( $username );
 		$services = MediaWikiServices::getInstance();
-		$passwordFactory = new PasswordFactory();
-		$passwordFactory->init( $services->getMainConfig() );
+		if ( $services->hasService( 'PasswordFactory' ) ) {
+			$passwordFactory = $services->getPasswordFactory();
+		} else {
+			$passwordFactory = new \PasswordFactory();
+			$passwordFactory->init( $services->getMainConfig() );
+		}
 
 		$dbr = $services->getDBLoadBalancer()->getConnection( DB_REPLICA );
 		$row = $dbr->selectRow( 'user', 'user_password', [ 'user_name' => $user->getName() ] );
