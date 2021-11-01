@@ -42,9 +42,9 @@ class PluggableAuth extends PluggableAuthBase {
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
-		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN];
-		$username = $extraLoginFields[ExtraLoginFields::USERNAME];
-		$password = $extraLoginFields[ExtraLoginFields::PASSWORD];
+		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN] ?? '';
+		$username = $extraLoginFields[ExtraLoginFields::USERNAME] ?? '';
+		$password = $extraLoginFields[ExtraLoginFields::PASSWORD] ?? '';
 
 		$isLocal = $this->maybeLocalLogin( $domain, $username, $password, $id, $errorMessage );
 		if ( $isLocal !== null ) {
