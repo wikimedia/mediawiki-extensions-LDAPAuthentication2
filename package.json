@@ -1,4 +1,5 @@
 {
+	"name": "LDAPAuthentication2",
 	"private": true,
 	"scripts": {
 		"test": "grunt test"
