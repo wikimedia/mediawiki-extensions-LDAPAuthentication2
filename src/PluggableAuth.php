@@ -61,6 +61,10 @@ class PluggableAuth extends PluggableAuthBase {
 		$user = User::newFromName( $username );
 		if ( $user !== false && $user->getId() !== 0 ) {
 			$id = $user->getId();
+
+			// Make sure that the user-domain-relation is updated for existing users.
+			// PluggableAuth will only call this when a user get's newly created.
+			$this->saveExtraAttributes( $id );
 		}
 
 		return true;
