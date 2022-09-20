@@ -246,7 +246,7 @@ class PluggableAuth extends PluggableAuthBase {
 		$userDomainStore = new UserDomainStore( $this->services->getDBLoadBalancer() );
 
 		$userDomainStore->setDomainForUser(
-			\User::newFromId( $userId ),
+			$this->services->getUserFactory()->newFromId( $userId ),
 			$domain
 		);
 	}
