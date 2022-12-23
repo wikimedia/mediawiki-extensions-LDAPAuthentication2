@@ -25,6 +25,13 @@ class PluggableAuth extends PluggableAuthBase {
 	 */
 	private $authManager;
 
+	/** @var MediaWikiServices */
+	protected $services = null;
+
+	public function __construct() {
+		$this->services = MediaWikiServices::getInstance();
+	}
+
 	/**
 	 * Authenticates against LDAP
 	 * @param int &$id not used
@@ -58,7 +65,7 @@ class PluggableAuth extends PluggableAuthBase {
 		}
 
 		$username = $this->normalizeUsername( $username );
-		$user = User::newFromName( $username );
+		$user = $this->services->getUserFactory()->newFromName( $username );
 		if ( $user !== false && $user->getId() !== 0 ) {
 			$id = $user->getId();
 
@@ -236,9 +243,7 @@ class PluggableAuth extends PluggableAuthBase {
 		if ( $domain === null ) {
 			return;
 		}
-		$userDomainStore = new UserDomainStore(
-			MediaWikiServices::getInstance()->getDBLoadBalancer()
-		);
+		$userDomainStore = new UserDomainStore( $this->services->getDBLoadBalancer() );
 
 		$userDomainStore->setDomainForUser(
 			\User::newFromId( $userId ),
@@ -254,16 +259,15 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @return ?User
 	 */
 	protected function checkLocalPassword( $username, $password ) {
-		$user = User::newFromName( $username );
-		$services = MediaWikiServices::getInstance();
-		if ( $services->hasService( 'PasswordFactory' ) ) {
-			$passwordFactory = $services->getPasswordFactory();
+		$user = $this->services->getUserFactory()->newFromName( $username );
+		if ( $this->services->hasService( 'PasswordFactory' ) ) {
+			$passwordFactory = $this->services->getPasswordFactory();
 		} else {
 			$passwordFactory = new \PasswordFactory();
-			$passwordFactory->init( $services->getMainConfig() );
+			$passwordFactory->init( $this->services->getMainConfig() );
 		}
 
-		$dbr = $services->getDBLoadBalancer()->getConnection( DB_REPLICA );
+		$dbr = $this->services->getDBLoadBalancer()->getConnection( DB_REPLICA );
 		$row = $dbr->selectRow( 'user', 'user_password', [ 'user_name' => $user->getName() ] );
 		$passwordInDB = $passwordFactory->newFromCiphertext( $row->user_password );
 
@@ -278,7 +282,7 @@ class PluggableAuth extends PluggableAuthBase {
 	protected function getAuthManager() {
 		if ( method_exists( MediaWikiServices::class, 'getAuthManager' ) ) {
 			// MediaWiki 1.35+
-			$authManager = MediaWikiServices::getInstance()->getAuthManager();
+			$authManager = $this->services->getAuthManager();
 		} else {
 			$authManager = AuthManager::singleton();
 		}
