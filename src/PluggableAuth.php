@@ -280,12 +280,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @return AuthManager
 	 */
 	protected function getAuthManager() {
-		if ( method_exists( MediaWikiServices::class, 'getAuthManager' ) ) {
-			// MediaWiki 1.35+
-			$authManager = $this->services->getAuthManager();
-		} else {
-			$authManager = AuthManager::singleton();
-		}
+		$authManager = $this->services->getAuthManager();
 		return $authManager;
 	}
 }
