@@ -3,6 +3,7 @@
 namespace MediaWiki\Extension\LDAPAuthentication2;
 
 use MediaWiki\Extension\LDAPProvider\DomainConfigFactory;
+use MediaWiki\MediaWikiServices;
 use OutputPage;
 use Skin;
 
@@ -33,7 +34,14 @@ class Setup {
 		 */
 		$config = new Config();
 		if ( $out->getTitle()->isSpecial( 'Userlogin' ) && $config->get( 'AllowLocalLogin' ) ) {
-			$out->addInlineStyle( '#wpLoginAttempt { display: none; }' );
+			$authManager = MediaWikiServices::getInstance()->getAuthManager();
+			$domainSessionKey = $authManager->getAuthenticationSessionData( PluggableAuth::DOMAIN_SESSION_KEY );
+
+			// We don't know the domain only on the first step
+			if ( $domainSessionKey === null ) {
+				// Hide that button only for the first login step
+				$out->addInlineStyle( '#wpLoginAttempt { display: none; }' );
+			}
 		}
 		return true;
 	}
