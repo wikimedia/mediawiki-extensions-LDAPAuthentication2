@@ -1,6 +1,6 @@
 {
 	"name": "LDAPAuthentication2",
-	"version": "1.0.3",
+	"version": "2.0.0",
 	"author": [
 		"Cindy Cicalese",
 		"[https://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
@@ -12,9 +12,6 @@
 	"type": "other",
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\LDAPAuthentication2\\": "src/"
-	},
-	"TestAutoloadNamespaces": {
-		"MediaWiki\\Extension\\LDAPAuthentication2\\Tests\\": "tests/phpunit/"
 	},
 	"requires": {
 		"MediaWiki": ">= 1.34.0",
@@ -28,12 +25,7 @@
 			"i18n"
 		]
 	},
-	"ExtensionFunctions": [
-		"MediaWiki\\Extension\\LDAPAuthentication2\\Setup::init"
-	],
-	"Hooks": {
-		"BeforePageDisplay": "MediaWiki\\Extension\\LDAPAuthentication2\\Setup::onBeforePageDisplay"
-	},
+	"Hooks": {},
 	"config_prefix": "",
 	"config": {
 		"LDAPAuthentication2AllowLocalLogin": {
@@ -47,9 +39,6 @@
 			"path": false,
 			"description": "Use this function for normalizing username for LDAP, for example 'strtolower'. Needed after migration from earlier Version.",
 			"public": true
-		},
-		"wgPluggableAuth_Class": {
-			"value": "MediaWiki\\Extension\\LDAPAuthentication2\\PluggableAuth"
 		}
 	},
 	"attributes": {
@@ -60,6 +49,17 @@
 					"realnameattribute": "cn",
 					"emailattribute": "mail"
 				}
+			}
+		},
+		"PluggableAuth": {
+			"LDAPAuthentication2": {
+				"class": "MediaWiki\\Extension\\LDAPAuthentication2\\PluggableAuth",
+				"services": [
+					"UserFactory",
+					"AuthManager",
+					"DBLoadBalancer",
+					"PasswordFactory"
+				]
 			}
 		}
 	},
