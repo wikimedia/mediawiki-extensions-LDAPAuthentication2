@@ -260,12 +260,7 @@ class PluggableAuth extends PluggableAuthBase {
 	 */
 	protected function checkLocalPassword( $username, $password ) {
 		$user = $this->services->getUserFactory()->newFromName( $username );
-		if ( $this->services->hasService( 'PasswordFactory' ) ) {
-			$passwordFactory = $this->services->getPasswordFactory();
-		} else {
-			$passwordFactory = new \PasswordFactory();
-			$passwordFactory->init( $this->services->getMainConfig() );
-		}
+		$passwordFactory = $this->services->getPasswordFactory();
 
 		$dbr = $this->services->getDBLoadBalancer()->getConnection( DB_REPLICA );
 		$row = $dbr->selectRow( 'user', 'user_password', [ 'user_name' => $user->getName() ] );
