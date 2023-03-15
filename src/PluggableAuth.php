@@ -8,15 +8,38 @@ use MediaWiki\Extension\LDAPProvider\ClientConfig;
 use MediaWiki\Extension\LDAPProvider\ClientFactory;
 use MediaWiki\Extension\LDAPProvider\LDAPNoDomainConfigException as NoDomain;
 use MediaWiki\Extension\LDAPProvider\UserDomainStore;
-use MediaWiki\MediaWikiServices;
+use MediaWiki\Extension\PluggableAuth\PluggableAuthLogin;
+use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\User\UserFactory;
+use MediaWiki\User\UserIdentity;
 use MWException;
-use PluggableAuth as PluggableAuthBase;
-use PluggableAuthLogin;
+use PasswordFactory;
 use User;
+use Wikimedia\Rdbms\ILoadBalancer;
 
-class PluggableAuth extends PluggableAuthBase {
+class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 
 	const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
+
+	/**
+	 * Domain value in case of local domain
+	 */
+	const DOMAIN_VALUE_LOCAL = 'local';
+
+	/**
+	 * Data key name, where domain name is stored
+	 */
+	const DOMAIN = 'domain';
+
+	/**
+	 * Name of username extra login field
+	 */
+	const USERNAME = 'username';
+
+	/**
+	 * Name of password extra login field
+	 */
+	const PASSWORD = 'password';
 
 	/**
 	 * AuthManager instance to manage authentication session data
@@ -25,38 +48,75 @@ class PluggableAuth extends PluggableAuthBase {
 	 */
 	private $authManager;
 
-	/** @var MediaWikiServices */
-	protected $services = null;
+	/**
+	 * @var UserFactory
+	 */
+	private $userFactory;
 
-	public function __construct() {
-		$this->services = MediaWikiServices::getInstance();
+	/**
+	 * @var ILoadBalancer
+	 */
+	private $loadBalancer;
+
+	/**
+	 * @var PasswordFactory
+	 */
+	private $passwordFactory;
+
+	/**
+	 * @param UserFactory $userFactory
+	 * @param AuthManager $authManager
+	 * @param ILoadBalancer $loadBalancer
+	 * @param PasswordFactory $passwordFactory
+	 */
+	public function __construct(
+		UserFactory $userFactory,
+		AuthManager $authManager,
+		ILoadBalancer $loadBalancer,
+		PasswordFactory $passwordFactory
+	) {
+		$this->userFactory = $userFactory;
+		$this->authManager = $authManager;
+		$this->loadBalancer = $loadBalancer;
+		$this->passwordFactory = $passwordFactory;
+
+		$this->logger = LoggerFactory::getInstance( 'LDAPAuthentication2' );
 	}
 
 	/**
 	 * Authenticates against LDAP
-	 * @param int &$id not used
-	 * @param string &$username set to username
-	 * @param string &$realname set to real name
-	 * @param string &$email set to email
-	 * @param string &$errorMessage any errors
+	 * @param int|null &$id not used
+	 * @param string|null &$username set to username
+	 * @param string|null &$realname set to real name
+	 * @param string|null &$email set to email
+	 * @param string|null &$errorMessage any errors
 	 * @return bool false on failure
 	 * @SuppressWarnings( UnusedFormalParameter )
 	 * @SuppressWarnings( ShortVariable )
 	 */
-	public function authenticate( &$id, &$username, &$realname, &$email, &$errorMessage ) {
-		$this->authManager = $this->getAuthManager();
+	public function authenticate(
+		?int &$id,
+		?string &$username,
+		?string &$realname,
+		?string &$email,
+		?string &$errorMessage
+	): bool {
 		$extraLoginFields = $this->authManager->getAuthenticationSessionData(
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
-		$domain = $extraLoginFields[ExtraLoginFields::DOMAIN] ?? '';
-		$username = $extraLoginFields[ExtraLoginFields::USERNAME] ?? '';
-		$password = $extraLoginFields[ExtraLoginFields::PASSWORD] ?? '';
+		$domain = $this->data[static::DOMAIN];
+		$username = $extraLoginFields[static::USERNAME] ?? '';
+		$password = $extraLoginFields[static::PASSWORD] ?? '';
+
+		$this->logger->info( 'Try to authenticate user: ' . $username );
 
 		$isLocal = $this->maybeLocalLogin( $domain, $username, $password, $id, $errorMessage );
 		if ( $isLocal !== null ) {
 			return $isLocal;
 		}
+
+		$this->logger->info( 'Not local login. Checking LDAP...' );
 
 		if ( !$this->checkLDAPLogin(
 			$domain, $username, $password, $realname, $email, $errorMessage
@@ -65,7 +125,7 @@ class PluggableAuth extends PluggableAuthBase {
 		}
 
 		$username = $this->normalizeUsername( $username );
-		$user = $this->services->getUserFactory()->newFromName( $username );
+		$user = $this->userFactory->newFromName( $username );
 		if ( $user !== false && $user->getId() !== 0 ) {
 			$id = $user->getId();
 
@@ -122,9 +182,11 @@ class PluggableAuth extends PluggableAuthBase {
 		&$id,
 		&$errorMessage
 	) {
-		if ( $domain === ExtraLoginFields::DOMAIN_VALUE_LOCAL ) {
+		if ( $domain === static::DOMAIN_VALUE_LOCAL ) {
 			$config = Config::newInstance();
 			if ( !$config->get( "AllowLocalLogin" ) ) {
+				$this->logger->error( 'Local logins are not allowed.' .
+					'Check "$LDAPAuthentication2AllowLocalLogin" for more details' );
 				$errorMessage = wfMessage( 'ldapauthentication2-no-local-login' )->plain();
 				return false;
 			}
@@ -139,12 +201,15 @@ class PluggableAuth extends PluggableAuthBase {
 					$domain
 				);
 
+				$this->logger->info( 'Local login succeeded.' );
 				return true;
 			}
 
 			$errorMessage = wfMessage(
 				'ldapauthentication2-error-local-authentication-failed'
 			)->plain();
+			$this->logger->error( 'Local authentication failed. Username: ' . $username );
+
 			return false;
 		}
 
@@ -178,8 +243,7 @@ class PluggableAuth extends PluggableAuthBase {
 		 * complicating things, we can not persist the domain here, as the
 		 * user id may be null (first login)
 		 */
-		$authManager = $this->getAuthManager();
-		$authManager->setAuthenticationSessionData(
+		$this->authManager->setAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY,
 			$domain
 		);
@@ -192,18 +256,28 @@ class PluggableAuth extends PluggableAuthBase {
 			return false;
 		}
 
+		$this->logger->info( 'LDAP domain: ' . $domain );
+
 		if ( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage = wfMessage(
 				'ldapauthentication2-error-authentication-failed', $domain
 			)->text();
+
+			$this->logger->error( 'Could not bind to LDAP domain with given user: ' . $username );
 			return false;
 		}
 		try {
 			$result = $ldapClient->getUserInfo( $username );
-			$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
-			$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
-			// maybe there are no emails stored in LDAP, this prevents php notices:
-			$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ?? '';
+
+			if ( $result ) {
+				$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
+				$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
+				// maybe there are no emails stored in LDAP, this prevents php notices:
+				$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ?? '';
+			} else {
+				$this->logger->error( "No user info found for user: $username." .
+					'Please check LDAP domain configuration' );
+			}
 		} catch ( Exception $ex ) {
 			$errorMessage = wfMessage(
 				'ldapauthentication2-error-authentication-failed-userinfo', $domain
@@ -215,13 +289,15 @@ class PluggableAuth extends PluggableAuthBase {
 			return false;
 		}
 
+		$this->logger->info( 'LDAP login succeeded.' );
+
 		return true;
 	}
 
 	/**
-	 * @param User &$user to log out
+	 * @param UserIdentity &$user to log out
 	 */
-	public function deauthenticate( User &$user ) {
+	public function deauthenticate( UserIdentity &$user ): void {
 		// Nothing to do, really
 		$user = null;
 	}
@@ -229,9 +305,8 @@ class PluggableAuth extends PluggableAuthBase {
 	/**
 	 * @param int $userId for user
 	 */
-	public function saveExtraAttributes( $userId ) {
-		$authManager = $this->getAuthManager();
-		$domain = $authManager->getAuthenticationSessionData(
+	public function saveExtraAttributes( int $userId ): void {
+		$domain = $this->authManager->getAuthenticationSessionData(
 			static::DOMAIN_SESSION_KEY
 		);
 
@@ -243,10 +318,10 @@ class PluggableAuth extends PluggableAuthBase {
 		if ( $domain === null ) {
 			return;
 		}
-		$userDomainStore = new UserDomainStore( $this->services->getDBLoadBalancer() );
+		$userDomainStore = new UserDomainStore( $this->loadBalancer );
 
 		$userDomainStore->setDomainForUser(
-			$this->services->getUserFactory()->newFromId( $userId ),
+			$this->userFactory->newFromId( $userId ),
 			$domain
 		);
 	}
@@ -259,23 +334,31 @@ class PluggableAuth extends PluggableAuthBase {
 	 * @return ?User
 	 */
 	protected function checkLocalPassword( $username, $password ) {
-		$user = $this->services->getUserFactory()->newFromName( $username );
-		$passwordFactory = $this->services->getPasswordFactory();
+		$user = $this->userFactory->newFromName( $username );
 
-		$dbr = $this->services->getDBLoadBalancer()->getConnection( DB_REPLICA );
+		$dbr = $this->loadBalancer->getConnection( DB_REPLICA );
 		$row = $dbr->selectRow( 'user', 'user_password', [ 'user_name' => $user->getName() ] );
-		$passwordInDB = $passwordFactory->newFromCiphertext( $row->user_password );
+		$passwordInDB = $this->passwordFactory->newFromCiphertext( $row->user_password );
 
 		return $passwordInDB->verify( $password ) ? $user : null;
 	}
 
 	/**
-	 * Provide a getter for the AuthManager to abstract out version checking.
-	 *
-	 * @return AuthManager
+	 * @inheritDoc
 	 */
-	protected function getAuthManager() {
-		$authManager = $this->services->getAuthManager();
-		return $authManager;
+	public static function getExtraLoginFields(): array {
+		return [
+			static::USERNAME => [
+				'type' => 'string',
+				'label' => wfMessage( 'userlogin-yourname' ),
+				'help' => wfMessage( 'authmanager-username-help' ),
+			],
+			static::PASSWORD => [
+				'type' => 'password',
+				'label' => wfMessage( 'userlogin-yourpassword' ),
+				'help' => wfMessage( 'authmanager-password-help' ),
+				'sensitive' => true,
+			]
+		];
 	}
 }
