@@ -14,10 +14,10 @@
 		"MediaWiki\\Extension\\LDAPAuthentication2\\": "src/"
 	},
 	"requires": {
-		"MediaWiki": ">= 1.34.0",
+		"MediaWiki": ">= 1.35.0",
 		"extensions": {
 			"LDAPProvider": "1.*",
-			"PluggableAuth": "*"
+			"PluggableAuth": "6.*"
 		}
 	},
 	"MessagesDirs": {
