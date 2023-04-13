@@ -270,6 +270,16 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 			$result = $ldapClient->getUserInfo( $username );
 
 			if ( $result ) {
+				if ( !isset( $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )] ) ) {
+					$this->logger->error( 'Username not found in user info provided by LDAP!' .
+						'Please check LDAP domain configuration. Specifically ' .
+						ClientConfig::USERINFO_USERNAME_ATTR );
+					$this->logger->debug( "LDAP user info results for user $username: " . print_r( $result, true ) );
+
+					// We anyway cannot proceed if we don't have correct username from LDAP
+					return false;
+				}
+
 				$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
 				$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
 				// maybe there are no emails stored in LDAP, this prevents php notices:
