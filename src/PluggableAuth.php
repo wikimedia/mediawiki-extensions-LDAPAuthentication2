@@ -106,7 +106,7 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 		);
 
 		$data = $this->getData();
-		$domain = $data[static::DOMAIN];
+		$domain = $data->get( static::DOMAIN );
 		$username = $extraLoginFields[static::USERNAME] ?? '';
 		$password = $extraLoginFields[static::PASSWORD] ?? '';
 
