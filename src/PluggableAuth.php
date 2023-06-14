@@ -80,7 +80,7 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 		$this->loadBalancer = $loadBalancer;
 		$this->passwordFactory = $passwordFactory;
 
-		$this->logger = LoggerFactory::getInstance( 'LDAPAuthentication2' );
+		$this->setLogger( LoggerFactory::getInstance( 'LDAPAuthentication2' ) );
 	}
 
 	/**
@@ -105,18 +105,19 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 			PluggableAuthLogin::EXTRALOGINFIELDS_SESSION_KEY
 		);
 
-		$domain = $this->data[static::DOMAIN];
+		$data = $this->getData();
+		$domain = $data[static::DOMAIN];
 		$username = $extraLoginFields[static::USERNAME] ?? '';
 		$password = $extraLoginFields[static::PASSWORD] ?? '';
 
-		$this->logger->info( 'Try to authenticate user: ' . $username );
+		$this->getLogger()->info( 'Try to authenticate user: ' . $username );
 
 		$isLocal = $this->maybeLocalLogin( $domain, $username, $password, $id, $errorMessage );
 		if ( $isLocal !== null ) {
 			return $isLocal;
 		}
 
-		$this->logger->info( 'Not local login. Checking LDAP...' );
+		$this->getLogger()->info( 'Not local login. Checking LDAP...' );
 
 		if ( !$this->checkLDAPLogin(
 			$domain, $username, $password, $realname, $email, $errorMessage
@@ -185,7 +186,7 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 		if ( $domain === static::DOMAIN_VALUE_LOCAL ) {
 			$config = Config::newInstance();
 			if ( !$config->get( "AllowLocalLogin" ) ) {
-				$this->logger->error( 'Local logins are not allowed.' .
+				$this->getLogger()->error( 'Local logins are not allowed.' .
 					'Check "$LDAPAuthentication2AllowLocalLogin" for more details' );
 				$errorMessage = wfMessage( 'ldapauthentication2-no-local-login' )->plain();
 				return false;
@@ -201,14 +202,14 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 					$domain
 				);
 
-				$this->logger->info( 'Local login succeeded.' );
+				$this->getLogger()->info( 'Local login succeeded.' );
 				return true;
 			}
 
 			$errorMessage = wfMessage(
 				'ldapauthentication2-error-local-authentication-failed'
 			)->plain();
-			$this->logger->error( 'Local authentication failed. Username: ' . $username );
+			$this->getLogger()->error( 'Local authentication failed. Username: ' . $username );
 
 			return false;
 		}
@@ -256,14 +257,14 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 			return false;
 		}
 
-		$this->logger->info( 'LDAP domain: ' . $domain );
+		$this->getLogger()->info( 'LDAP domain: ' . $domain );
 
 		if ( !$ldapClient->canBindAs( $username, $password ) ) {
 			$errorMessage = wfMessage(
 				'ldapauthentication2-error-authentication-failed', $domain
 			)->text();
 
-			$this->logger->error( 'Could not bind to LDAP domain with given user: ' . $username );
+			$this->getLogger()->error( 'Could not bind to LDAP domain with given user: ' . $username );
 			return false;
 		}
 		try {
@@ -271,10 +272,10 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 
 			if ( $result ) {
 				if ( !isset( $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )] ) ) {
-					$this->logger->error( 'Username not found in user info provided by LDAP!' .
+					$this->getLogger()->error( 'Username not found in user info provided by LDAP!' .
 						'Please check LDAP domain configuration. Specifically ' .
 						ClientConfig::USERINFO_USERNAME_ATTR );
-					$this->logger->debug( "LDAP user info results for user $username: " . print_r( $result, true ) );
+					$this->getLogger()->debug( "LDAP user info results for user $username: " . print_r( $result, true ) );
 
 					// We anyway cannot proceed if we don't have correct username from LDAP
 					return false;
@@ -285,7 +286,7 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 				// maybe there are no emails stored in LDAP, this prevents php notices:
 				$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ?? '';
 			} else {
-				$this->logger->error( "No user info found for user: $username." .
+				$this->getLogger()->error( "No user info found for user: $username." .
 					'Please check LDAP domain configuration' );
 			}
 		} catch ( Exception $ex ) {
@@ -299,7 +300,7 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 			return false;
 		}
 
-		$this->logger->info( 'LDAP login succeeded.' );
+		$this->getLogger()->info( 'LDAP login succeeded.' );
 
 		return true;
 	}
