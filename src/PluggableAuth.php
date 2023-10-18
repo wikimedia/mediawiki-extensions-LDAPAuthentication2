@@ -275,16 +275,21 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 					$this->getLogger()->error( 'Username not found in user info provided by LDAP!' .
 						'Please check LDAP domain configuration. Specifically ' .
 						ClientConfig::USERINFO_USERNAME_ATTR );
-					$this->getLogger()->debug( "LDAP user info results for user $username: " . print_r( $result, true ) );
+					$this->getLogger()->debug(
+						"LDAP user info results for user $username: " . print_r( $result, true )
+					);
 
 					// We anyway cannot proceed if we don't have correct username from LDAP
 					return false;
 				}
 
-				$username = $result[$ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR )];
-				$realname = $result[$ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR )];
-				// maybe there are no emails stored in LDAP, this prevents php notices:
-				$email = $result[$ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR )] ?? '';
+				$usernameAttr = $ldapClient->getConfig( ClientConfig::USERINFO_USERNAME_ATTR );
+				$realnameAttr = $ldapClient->getConfig( ClientConfig::USERINFO_REALNAME_ATTR );
+				$emailAttr = $ldapClient->getConfig( ClientConfig::USERINFO_EMAIL_ATTR );
+
+				$username = $this->getFromResult( $result, $usernameAttr );
+				$realname = $this->getFromResult( $result, $realnameAttr );
+				$email = $this->getFromResult( $result, $emailAttr );
 			} else {
 				$this->getLogger()->error( "No user info found for user: $username." .
 					'Please check LDAP domain configuration' );
@@ -303,6 +308,24 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 		$this->getLogger()->info( 'LDAP login succeeded.' );
 
 		return true;
+	}
+
+	/**
+	 * @param array $result
+	 * @param string $key
+	 * @return string
+	 */
+	private function getFromResult( $result, $key ) {
+		$value = '';
+		if ( !isset( $result[$key] ) ) {
+			return $value;
+		}
+		$value = $result[$key];
+		if ( is_array( $value ) ) {
+			$firstItemKey = array_key_first( $value );
+			$value = $value[$firstItemKey];
+		}
+		return $value;
 	}
 
 	/**
