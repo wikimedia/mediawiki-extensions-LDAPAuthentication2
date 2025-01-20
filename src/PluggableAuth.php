@@ -10,11 +10,11 @@ use MediaWiki\Extension\LDAPProvider\LDAPNoDomainConfigException as NoDomain;
 use MediaWiki\Extension\LDAPProvider\UserDomainStore;
 use MediaWiki\Extension\PluggableAuth\PluggableAuthLogin;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\User\User;
 use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserIdentity;
 use MWException;
 use PasswordFactory;
-use User;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
