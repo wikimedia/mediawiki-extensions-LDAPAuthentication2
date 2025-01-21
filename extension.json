@@ -14,7 +14,7 @@
 		"MediaWiki\\Extension\\LDAPAuthentication2\\": "src/"
 	},
 	"requires": {
-		"MediaWiki": ">= 1.39.0",
+		"MediaWiki": ">= 1.43.0",
 		"extensions": {
 			"LDAPProvider": "3.*",
 			"PluggableAuth": "7.*"
