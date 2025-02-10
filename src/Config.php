@@ -2,7 +2,7 @@
 
 namespace MediaWiki\Extension\LDAPAuthentication2;
 
-use GlobalVarConfig;
+use MediaWiki\Config\GlobalVarConfig;
 
 class Config extends GlobalVarConfig {
 	const VERSION = "1.0.2";
