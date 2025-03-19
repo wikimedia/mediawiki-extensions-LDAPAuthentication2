@@ -371,7 +371,12 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 		$user = $this->userFactory->newFromName( $username );
 
 		$dbr = $this->loadBalancer->getConnection( DB_REPLICA );
-		$row = $dbr->selectRow( 'user', 'user_password', [ 'user_name' => $user->getName() ] );
+		$row = $dbr->selectRow(
+			'user',
+			'user_password',
+			[ 'user_name' => $user->getName() ],
+			__METHOD__
+		);
 		$passwordInDB = $this->passwordFactory->newFromCiphertext( $row->user_password );
 
 		return $passwordInDB->verify( $password ) ? $user : null;
