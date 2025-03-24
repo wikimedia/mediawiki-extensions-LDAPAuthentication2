@@ -1,6 +1,6 @@
 {
 	"name": "LDAPAuthentication2",
-	"version": "3.0.0-alpha",
+	"version": "4.0.0-alpha",
 	"author": [
 		"Cindy Cicalese",
 		"[https://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
@@ -14,7 +14,7 @@
 		"MediaWiki\\Extension\\LDAPAuthentication2\\": "src/"
 	},
 	"requires": {
-		"MediaWiki": ">= 1.39.0",
+		"MediaWiki": ">= 1.43.0",
 		"extensions": {
 			"LDAPProvider": "3.*",
 			"PluggableAuth": "7.*"
