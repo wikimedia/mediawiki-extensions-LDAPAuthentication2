@@ -1,6 +1,6 @@
 {
 	"name": "LDAPAuthentication2",
-	"version": "3.0.0-alpha",
+	"version": "3.0.0",
 	"author": [
 		"Cindy Cicalese",
 		"[https://mediawiki.org/wiki/User:MarkAHershberger Mark A. Hershberger]",
