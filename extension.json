@@ -13,6 +13,9 @@
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\LDAPAuthentication2\\": "src/"
 	},
+	"TestAutoloadNamespaces": {
+		"MediaWiki\\Extension\\LDAPAuthentication2\\Tests\\": "tests/phpunit/"
+	},
 	"requires": {
 		"MediaWiki": ">= 1.43.0",
 		"extensions": {
@@ -25,7 +28,14 @@
 			"i18n"
 		]
 	},
-	"Hooks": {},
+	"HookHandlers": {
+		"reorderLoginFields": {
+			"class": "MediaWiki\\Extension\\LDAPAuthentication2\\HookHandler\\ReorderLoginFields"
+		}
+	},
+	"Hooks": {
+		"AuthChangeFormFields": "reorderLoginFields"
+	},
 	"config_prefix": "",
 	"config": {
 		"LDAPAuthentication2AllowLocalLogin": {
