@@ -28,6 +28,11 @@
 			"name": "Cindy Cicalese",
 			"email": "cindom@gmail.com",
 			"role": "Contributor"
+		},
+		{
+			"name": "Hallo Welt! GmbH",
+			"email": "info@hallowelt.com",
+			"homepage": "https://www.hallowelt.com"
 		}
 	],
 	"require": {
