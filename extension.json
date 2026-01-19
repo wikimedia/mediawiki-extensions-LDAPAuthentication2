@@ -19,7 +19,7 @@
 	"requires": {
 		"MediaWiki": ">= 1.43.0",
 		"extensions": {
-			"LDAPProvider": "3.*",
+			"LDAPProvider": "4.*",
 			"PluggableAuth": "7.*"
 		}
 	},
