@@ -19,27 +19,27 @@ use Wikimedia\Rdbms\ILoadBalancer;
 
 class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 
-	const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
+	public const DOMAIN_SESSION_KEY = 'ldap-authentication-selected-domain';
 
 	/**
 	 * Domain value in case of local domain
 	 */
-	const DOMAIN_VALUE_LOCAL = 'local';
+	public const DOMAIN_VALUE_LOCAL = 'local';
 
 	/**
 	 * Data key name, where domain name is stored
 	 */
-	const DOMAIN = 'domain';
+	public const DOMAIN = 'domain';
 
 	/**
 	 * Name of username extra login field
 	 */
-	const USERNAME = 'username';
+	public const USERNAME = 'username';
 
 	/**
 	 * Name of password extra login field
 	 */
-	const PASSWORD = 'password';
+	public const PASSWORD = 'password';
 
 	/**
 	 * AuthManager instance to manage authentication session data
@@ -91,8 +91,6 @@ class PluggableAuth extends \MediaWiki\Extension\PluggableAuth\PluggableAuth {
 	 * @param string|null &$email set to email
 	 * @param string|null &$errorMessage any errors
 	 * @return bool false on failure
-	 * @SuppressWarnings( UnusedFormalParameter )
-	 * @SuppressWarnings( ShortVariable )
 	 */
 	public function authenticate(
 		?int &$id,
