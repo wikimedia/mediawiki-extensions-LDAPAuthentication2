@@ -5,7 +5,8 @@ namespace MediaWiki\Extension\LDAPAuthentication2;
 use MediaWiki\Config\GlobalVarConfig;
 
 class Config extends GlobalVarConfig {
-	const VERSION = "1.0.2";
+
+	public const VERSION = "1.0.2";
 
 	public function __construct() {
 		parent::__construct( 'LDAPAuthentication2' );
