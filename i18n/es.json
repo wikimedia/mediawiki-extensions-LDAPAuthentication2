@@ -1,0 +1,13 @@
+{
+        "@metadata": {
+                "authors": [
+                        "Ajuntament de Benicarló - correu.informatica@benicarlo.org"
+                ]
+        },
+        "ldapauthentication2-desc": "Permite la autenticación contra un recurso LDAP",
+        "ldapauthentication2-error-authentication-failed": "No se han podido autenticar las credenciales contra el dominio \"$1\"",
+        "ldapauthentication2-error-authentication-failed-userinfo": "No se ha podido obtener la información de usuario necesaria para completar el inicio de sesión",
+        "ldapauthentication2-no-domain-chosen": "Por favor, elija un dominio válido",
+        "ldapauthentication2-no-local-login": "No se permiten los inicios de sesión locales",
+        "ldapauthentication2-error-local-authentication-failed": "No se ha podido autenticar"
+}
